@@ -165,7 +165,7 @@ def occupation_group(occupation):
                     'Vocalist'
                     ],
             # catégorie fourre-tout, que je ne vais pas intégrer dans l'analyse
-            'religion_and_public_institutions': [
+            'religion_and_social_institutions': [
                     'Reformed_Church_in_Hungary',
                     'Oratory_of_St._Philip_Neri',
                     'Mysticism',
@@ -278,7 +278,7 @@ fig.show()
 ### Créer un fichier à utiliser pour classement
 # occupation.set_index
 ### Import et inspection des données
-# occupations_w_classes = pd.read_csv('../data/birthdate_occupation_group_no_poetry.csv')
+occupations_w_classes = pd.read_csv('../data/birthdate_occupation_group_no_poetry.csv')
 # occupations_w_classes.set_index('occupation_class', inplace=True, verify_integrity=True)
 ## https://stackoverflow.com/questions/13411544/delete-a-column-from-a-pandas-dataframe
 ## https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.drop.html
@@ -291,6 +291,7 @@ fig.show()
 
 ### Regrouper les données recodées par classe
 classes = occupations_w_classes.groupby(by='occupation_class').size().sort_values(ascending=False)
+# classes = occupations_w_classes.groupby(by='occupation_class').size().sort_values(ascending=False)
 classes = classes.reset_index()
 classes
 
@@ -329,7 +330,9 @@ periodes = df.groupby(by='qcut').size()
 periodes = periodes.reset_index()
 periodes
 
-bins = [1000, 1200, 1400, 1600, 1800, 2000]
+# bins = [1000, 1200, 1400, 1600, 1800, 2000] # rien entre 1200 et 1600!!!
+# bins = [1600, 1700, 1800, 1900, 2000]
+bins = [1600, 1650, 1700, 1750, 1800, 1850, 1900, 1950, 2000]
 
 # dfo['cut'] = pd.cut(dfo['birthYear'], bins=bins, right=False  )
 df['cut'] = pd.cut(df['birthdate'], bins=bins, right=False  )
@@ -344,7 +347,9 @@ periodes.info()
 
 ## bins 'imposés'
 # generations = [1451, 1501, 1551, 1601, 1651, 1701, 1751, 1801]
-doubles_centuries = [1000, 1200, 1400, 1600, 1800, 2000]
+# doubles_centuries = [1000, 1200, 1400, 1600, 1800, 2000]
+# doubles_centuries = [1001, 1201, 1401, 1601, 1801, 2001]
+doubles_centuries = [1600, 1650, 1700, 1750, 1800, 1850, 1900, 1950, 2000]
 df['doubles_centuries'] = pd.cut(df['birthdate'], doubles_centuries, right=False)
 # Inspection
 df.head()
@@ -395,7 +400,6 @@ show(indep.round(3))
 
 # Arrondi : effectifs théoriques
 show(indep.round(0).astype(int))
-
 
 # -
 
@@ -456,16 +460,14 @@ table
 ### % plus lisibles
 round(table*100,2)
 
-
 # -
 
 # * https://www.statology.org/cramers-v-in-python/
 # * https://www.statology.org/chi-square-test-of-independence-python/
 # * https://www.statology.org/chi-square-goodness-of-fit-test-python/
 
-dfo_fs.iloc[:-1,:-1]
-
-dfo_fs.iloc[-1:,-1:].to
+df_fs.iloc[:-1,:-1]
+# df_fs.iloc[-1:,-1:].to
 
 # +
 ### Coéfficient de Cramer
@@ -473,8 +475,8 @@ dfo_fs.iloc[-1:,-1:].to
 # https://www.geeksforgeeks.org/how-to-calculate-cramers-v-in-python/
 
 X2 = chi2.statistic
-N = np.sum(np.array(dfo_fs.iloc[:-1,:-1]))
-minimum_dimension = min(dfo_fs.shape)-1
+N = np.sum(np.array(df_fs.iloc[:-1,:-1]))
+minimum_dimension = min(df_fs.shape)-1
 N, X2, minimum_dimension
 
 # +
@@ -492,10 +494,10 @@ print(result)
 ## Le résultat montre un certain lien entre les variables, mais plutôt faible
 # Noter aussi que les effectifs de certaines paries de valeurs 
 # sont probablement insuffisant pour que ces tests soient valides
-stats.contingency.association(dfo_fs.iloc[:-1,:-1], method='cramer')
+stats.contingency.association(df_fs.iloc[:-1,:-1], method='cramer')
 # -
 
-https://en.wikipedia.org/wiki/Cramer’s_V
+# https://en.wikipedia.org/wiki/Cramer’s_V
 
 # ## Chi2 — générations
 
@@ -505,22 +507,22 @@ https://en.wikipedia.org/wiki/Cramer’s_V
 ## aux bords les effectifs marginaux qui correspondent 
 ## aux distributions indépendantes des variables
 
-X = "classe"  # "0"
-Y = "gen"
+X = "occupation_class"  # "0"
+Y = "cen"
 
-dfo_fs = dfo[[Y,X]].pivot_table(index=Y,columns=X,aggfunc=len,margins=True,margins_name="Total").fillna(0).astype(int)
-dfo_fs
+df_fs = dfo[[Y,X]].pivot_table(index=Y,columns=X,aggfunc=len,margins=True,margins_name="Total").fillna(0).astype(int)
+df_fs
 
 
 # -
 
 ### Total général, dernière cellule de la dernière ligne
-dfo_fs.iat[-1,-1]
+df_fs.iat[-1,-1]
 
 # +
-tx = dfo_fs.loc[:,["Total"]]
-ty = dfo_fs.loc[["Total"],:]
-n = dfo_fs.iat[-1,-1] 
+tx = df_fs.loc[:,["Total"]]
+ty = df_fs.loc[["Total"],:]
+n = df_fs.iat[-1,-1] 
 
 ### Compute the matrix multiplication between the columns.
 # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.dot.html
@@ -541,23 +543,23 @@ show(indep.round(0).astype(int))
 ### Doc. :
 #   Bennani, p.30
 #  https://openclassrooms.com/fr/courses/4525266-decrivez-et-nettoyez-votre-jeu-de-donnees/4775616-analysez-deux-variables-qualitatives-avec-le-chi-2
-ecarts = (dfo_fs-indep).iloc[:-1,:-1]
+ecarts = (df_fs-indep).iloc[:-1,:-1]
 ## Attention : arrondi aux entiers dans l'affichage
 print(ecarts.round(0).astype(int))
 
-dfo_fs.iloc[:-1,:-1]
+df_fs.iloc[:-1,:-1]
 
 ### Ecarts positifs et pondérés par les effectifs: contribution au Chi2
 ### Doc. :
 #   Bennani, p.31
 #  https://openclassrooms.com/fr/courses/4525266-decrivez-et-nettoyez-votre-jeu-de-donnees/4775616-analysez-deux-variables-qualitatives-avec-le-chi-2
-ecarts_ponderes = round((dfo_fs-indep)**2/indep,2)
+ecarts_ponderes = round((df_fs-indep)**2/indep,2)
 ecarts_ponderes.iloc[:-1,:-1]
 
 chi_2 = ecarts_ponderes.sum().sum()
 print(round(chi_2, 2))
 
-chi2 = stats.chi2_contingency(dfo_fs.iloc[:-1,:-1])
+chi2 = stats.chi2_contingency(df_fs.iloc[:-1,:-1])
 
 ### https://www.statology.org/chi-square-test-of-independence-python/
 chi2.statistic, chi2.pvalue
@@ -604,7 +606,7 @@ round(table*100,2)
 # * https://www.statology.org/chi-square-test-of-independence-python/
 # * https://www.statology.org/chi-square-goodness-of-fit-test-python/
 
-dfo_fs.iloc[:-1,:-1]
+df_fs.iloc[:-1,:-1]
 
 # +
 ### Coéfficient de Cramer
@@ -612,8 +614,8 @@ dfo_fs.iloc[:-1,:-1]
 # https://www.geeksforgeeks.org/how-to-calculate-cramers-v-in-python/
 
 X2 = chi2.statistic
-N = np.sum(np.array(dfo_fs.iloc[:-1,:-1]))
-minimum_dimension = min(dfo_fs.shape)-1
+N = np.sum(np.array(df_fs.iloc[:-1,:-1]))
+minimum_dimension = min(df_fs.shape)-1
 N, X2, minimum_dimension
 
 # +
@@ -631,7 +633,9 @@ print(result)
 ## Le résultat montre un certain lien entre les variables, mais plutôt faible
 # Noter aussi que les effectifs de certaines paries de valeurs 
 # sont probablement insuffisant pour que ces tests soient valides
-stats.contingency.association(dfo_fs.iloc[:-1,:-1], method='cramer')
+stats.contingency.association(df_fs.iloc[:-1,:-1], method='cramer')
 # -
 
-https://en.wikipedia.org/wiki/Cramer’s_V
+# https://en.wikipedia.org/wiki/Cramer’s_V
+
+# ca fonctionne... maintenant il faut comprendre!
