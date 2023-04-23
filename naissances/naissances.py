@@ -10,7 +10,7 @@ from IPython.display import SVG
 # Indiquer le CSV. 
 # Créer une liste vide. (Qui conviendra elle-meme des listes.)
 # Ouvrir le fichier et remplir la liste.
-csv_file = './data/dbpedia/dbpedia_poets_birthdate.csv'
+csv_file = '../data/dbpedia/dbpedia_poets_birthdate.csv'
 csv_content = []
 with open(csv_file) as f:
     rdr = csv.reader(f,delimiter=',')
@@ -44,7 +44,7 @@ ctr.most_common()[:7]  # print les 7 premieres de la liste
 data = [{'year': e[0], 'eff': e[1]} for e in ctr_l]; data[:3]
 
 # ouvrir un fichier et y mettre le dictionnaire en format JSON
-with open('data/birth_years_grouped.json', 'w') as f:
+with open('../data/birth_years_grouped.json', 'w') as f:
     json.dump(data, f)
 
 # list comprehensions: les années
@@ -131,12 +131,12 @@ fig.update_xaxes(tickangle=60, )
 fig.show()
 
 ### enregistrer au format HTML et ouvrir comme page web
-fig.write_html("pictures/birth_years_grouped.html")
+fig.write_html("../pictures/birth_years_grouped.html")
 
 ### enregistrer au format SVG
 # remplacer suffixe: .svg,  .html, .jpg ...
-fig.write_image("pictures/birth_years_grouped.svg") 
-chemin = "pictures/birth_years_grouped.svg"
+fig.write_image("../pictures/birth_years_grouped.svg") 
+chemin = "../pictures/birth_years_grouped.svg"
 SVG(filename=chemin)
 
 min(y_l), max(y_l)
@@ -189,7 +189,7 @@ fig.update_layout(hovermode="x unified",
         )
                  )
 fig.show()
-fig.write_html("pictures/birth_years_period.html") 
-fig.write_image("pictures/birth_years_period.svg") 
-chemin = "pictures/birth_years_period.svg"
+fig.write_html("../pictures/birth_years_period.html") 
+fig.write_image("../pictures/birth_years_period.svg") 
+chemin = "../pictures/birth_years_period.svg"
 SVG(filename=chemin)
