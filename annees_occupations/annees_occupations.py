@@ -262,33 +262,19 @@ with open(fp_no_poetry, 'w') as f:
     f.write('\n'.join(grouped_no_poetry)) 
 
 # on refait sans la catégorie "poetry"
-df = pd.read_csv(fp_no_poetry)
-print(df.shape, df.head(3), '\n\n-----\n', df.tail(3))
-df.info()# inspecter les colonnes
-show(df)# Afficher les données
+df = pd.read_csv(fp_no_poetry) # lire le fichier
+# df.info()# inspecter les colonnes
+# show(df)# Afficher les données
 occupation = df.groupby(by='occupation').size().sort_values(ascending=False)# Grouper par champ d'activité
 occupation = occupation.reset_index()
 occupation.head()
 occupation = occupation.rename(columns={'field':'occupation', 0: 'effectif'})# Renommer et inspecter les colonnes
-occupation.info()
-len(occupation), occupation.describe()# Inspecter le nombre de valeurs et leur distribution
+# occupation.info()
+# len(occupation), occupation.describe()# Inspecter le nombre de valeurs et leur distribution
 fig = px.bar(occupation, x='occupation', y='effectif')# Distribution des champs d'intérêt ou occupations
 fig.show() 
 
-### Créer un fichier à utiliser pour classement
-# occupation.set_index
-### Import et inspection des données
 occupations_w_classes = pd.read_csv('../data/birthdate_occupation_group_no_poetry.csv')
-# occupations_w_classes.set_index('occupation_class', inplace=True, verify_integrity=True)
-## https://stackoverflow.com/questions/13411544/delete-a-column-from-a-pandas-dataframe
-## https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.drop.html
-# occupations_w_classes.drop(occupations_w_classes.columns[[0,1]], axis=1, inplace=True) 
-# show(occupations_w_classes)
-### Jointure avec le tableau origine:
-# on ajoute ainsi à chaque ligne sa classe
-# dfo = df.merge(occupations_w_classes, how='left', left_on='occupation', right_index=True)
-# show(dfo)
-
 ### Regrouper les données recodées par classe
 classes = occupations_w_classes.groupby(by='occupation_class').size().sort_values(ascending=False)
 # classes = occupations_w_classes.groupby(by='occupation_class').size().sort_values(ascending=False)
@@ -346,22 +332,19 @@ periodes = periodes.rename(columns={ 0: 'effectif'})
 periodes.info()
 
 ## bins 'imposés'
-# generations = [1451, 1501, 1551, 1601, 1651, 1701, 1751, 1801]
-# doubles_centuries = [1000, 1200, 1400, 1600, 1800, 2000]
-# doubles_centuries = [1001, 1201, 1401, 1601, 1801, 2001]
-doubles_centuries = [1600, 1650, 1700, 1750, 1800, 1850, 1900, 1950, 2000]
-df['doubles_centuries'] = pd.cut(df['birthdate'], doubles_centuries, right=False)
+tranches = [1600, 1650, 1700, 1750, 1800, 1850, 1900, 1950, 2000]
+df['tranches'] = pd.cut(df['birthdate'], tranches, right=False)
 # Inspection
 df.head()
 
-df.groupby(by='doubles_centuries').size().sort_index()
+df.groupby(by='tranches').size().sort_index()
 
 df.drop(df[['qcut']], axis=1, inplace=True) 
 
 df['str_cut'] = df['cut'].apply(lambda x : str(int(x.left))+'-'+ str(int(x.right)-1))
 df['str_cut'][:2]
 
-df['cen'] = df['doubles_centuries'].apply(lambda x : str(int(x.left))+'-'+ str(int(x.right)-1))
+df['cen'] = df['tranches'].apply(lambda x : str(int(x.left))+'-'+ str(int(x.right)-1))
 df['cen'][:2]
 
 show(df)
@@ -510,7 +493,7 @@ stats.contingency.association(df_fs.iloc[:-1,:-1], method='cramer')
 X = "occupation_class"  # "0"
 Y = "cen"
 
-df_fs = dfo[[Y,X]].pivot_table(index=Y,columns=X,aggfunc=len,margins=True,margins_name="Total").fillna(0).astype(int)
+df_fs = df[[Y,X]].pivot_table(index=Y,columns=X,aggfunc=len,margins=True,margins_name="Total").fillna(0).astype(int)
 df_fs
 
 
@@ -594,10 +577,8 @@ table.loc['total'] = table.sum(axis=0)
 table
 
 # +
-
-
-### % plus lisibles
-round(table*100,2)
+##
+round(table*100,2)# % plus lisibles
 
 
 # -
@@ -619,12 +600,8 @@ minimum_dimension = min(df_fs.shape)-1
 N, X2, minimum_dimension
 
 # +
-  
-# Calculate Cramer's V
-result = np.sqrt((X2/N) / (minimum_dimension-1) )
-  
-# Print the result
-print(result)
+result = np.sqrt((X2/N) / (minimum_dimension-1) )# Calculate Cramer's V
+print(result)# Print the result
 
 # +
 ### Coéfficient de Cramer
