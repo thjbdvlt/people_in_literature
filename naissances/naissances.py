@@ -78,6 +78,7 @@ df.replace(
 df["birthDate"].replace(
     r"^([0-9]{4})-[0-9]{2}-[0-9]{2}", "\\1", regex=True, inplace=True
 )
+print(df.head())
 
 # Observer les valeurs extrêmes, pour éviter les problèmes futurs et pour pouvoir s'assurer d'une homogénéité des données (et de leur type). On voit qu'une personne, Virgile, a une date dont le format est différent. Puisqu'il s'agit de la seule valeur négative, je l'enlève des données.
 df.birthDate.sort_values()
@@ -122,19 +123,21 @@ for i in years_all:
         y.append((i, 0))
 
 # Print le début et la fin de la liste.
-y[:10]
-y[-10:]
+print(y[:10])
+print(y[-10:])
 
-# Une nouvelle visualisation avec les années vides (0 naissances). Cette visualisation est peu lisible, mais montre avec une évidence extrême la concentration de la population dans les 19e et 20e siècles.
+# Une nouvelle visualisation avec les années vides (0 naissances). Cette visualisation est peu lisible, mais montre avec une évidence extrême la concentration de la population dans les 19e et 20e siècles. Les individus nés avant le 16e siècle sont en nombre très faible. Cela provient naturellement en partie des sources disponibles, mais reflette aussi, pour la période médiévale en particulier, le statut très différents de la production littéraire: c'est seulement à l'époque moderne, et plus encore à partir des 18e et 19e siècles, sous l'influence de la pensée romantique, que la "création" artistique et littéraire est associée à des individus particuliers.
 plot = plt.bar(x=[i[0] for i in y], y=[i[1] for i in y])
 plot.show()
 
-# Je vais resserrer un peu, et ne me concentrer que sur la période moderniste, que je vais faire commencer en 1860, entre la publication par Baudelaire des 'Fleurs du mal' (1857) et de 'Un peintre de la vie moderne' (1863), deux textes fondamentaux pour la notion de modernité en littérature. On peut voir que les pics de naissances des individus répertoriés de la population se trouvent vers le milieu du siècle, entre les années 40 et les années 60. On peut expliquer cela par au moins deux choses: le fait que Wikipedia présente de façon générale davantage d'informations sur des personnes proches de nous dans le temps; et le fait que la reconnaissance par le champ littéraire, qui est un préalable à la recension d'un individu en tant que "Writer" ou "Poète" est un processus qui s'accomplit avec un certain délai: il est donc assez naturel que les personnes nées depuis les années 1990 soient en nombre aussi faible. À cela on peut encore ajouter deux choses: le fait que l'entrée dans le champ littéraire puisse être tardive dans la vie d'un individu; et le fait que la recherche en littératures à l'université se concentrait jusqu'à récemment sur des auteurices décédées, sur lesquel-les un recul plus important pouvait être pris.
+# Je vais resserrer un peu, et ne me concentrer que sur la période moderniste, que je vais faire commencer en 1860, entre la publication par Baudelaire des 'Fleurs du mal' (1857) et de 'Un peintre de la vie moderne' (1863), deux textes fondamentaux pour la notion de modernité en littérature.
 plot = plt.bar(
     x=[i[0] for i in y if i[0] > 1860],
     y=[i[1] for i in y if i[0] > 1860],
 )
 plot.show()
+
+# On peut voir que les pics de naissances des individus répertoriés de la population se trouvent vers le milieu du 20e siècle, entre les années 40 et les années 60. On peut expliquer cela par au moins deux choses: le fait que Wikipedia présente de façon générale davantage d'informations sur des personnes proches de nous dans le temps; et le fait que la reconnaissance par le champ littéraire, qui est un préalable à la recension d'un individu en tant que "Writer" ou "Poète" est un processus qui s'accomplit avec un certain délai: il est donc assez naturel que les personnes nées depuis les années 1990 soient en nombre aussi faible. À cela on peut encore ajouter deux choses: le fait que l'entrée dans le champ littéraire puisse être tardive dans la vie d'un individu; et le fait que la recherche en littératures à l'université se concentrait jusqu'à récemment sur des auteurices décédées, sur lesquel-les un recul plus important pouvait être pris.
 
 # Une dernière représentation, par tranche de 10 ans. Pour la construire, je rassemble les années en écartant leur dernier nombre et en le remplaçant par 0 et en additionnant les valeurs des années ainsi regroupées.
 w = dict([[i, 0] for i in range(1860, 2001, 10)])
