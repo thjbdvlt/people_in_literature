@@ -92,6 +92,8 @@ df[df["birthDate"].str.len() < 4]
 # Comme il n'y en a pas, regarder s'il y en a qui commencent par "0".
 df[df["birthDate"].str.startswith("0")]
 
+# Visiblement, et après confirmation par la consultation de la page Wikipedia, ces données sont erronées. Mais au vu de leur nombre, qui est très faible (3 sur une population de 10'000), je me permets de les négliger.
+
 # Une première représentation, des années qui ont le plus de naissances et de celles qui en ont le moins. Quoique cette représentation ne soit pas vraiment appropriée, elle nous permet déjà de voir que les naissances augmentent à mesure qu'on se rapproche de nous dans le temps: l'axe des x a un air approximativement décroissant.
 plot = plt.bar(df.birthDate.value_counts())
 plot.show()
