@@ -140,7 +140,7 @@ plot.show()
 w = dict([[i, 0] for i in range(1860, 2001, 10)])
 for i in y:
     if i[0] > 1859:
-        j = int(f'{str(i[0])[:3]}0')
+        j = int(f"{str(i[0])[:3]}0")
         w[j] = w[j] + i[1]
 plot = plt.bar(x=w.keys(), y=w.values())
 plot.show()
