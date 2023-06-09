@@ -83,7 +83,7 @@ print(df.head())
 # Observer les valeurs extrêmes, pour éviter les problèmes futurs et pour pouvoir s'assurer d'une homogénéité des données (et de leur type). On voit qu'une personne, Virgile, a une date dont le format est différent. Puisqu'il s'agit de la seule valeur négative, je l'enlève des données.
 df.birthDate.sort_values()
 
-# L'opération que j'utilise pour homogénéiser les valeur consiste à enlever les rows dans lequelles la valeur de birthDate est plus grande que 4 caractères. De cette façon, si les données se trouvaient modifiées pour une raison quelconque, l'opération continuerait à être efficace (contrairement à si j'enlevais la row à partir de son index).
+# L'opération que j'utilise pour homogénéiser les valeurs consiste à enlever les rows dans lequelles la valeur de birthDate est plus grande que 4 caractères. De cette façon, si les données se trouvaient modifiées pour une raison quelconque, l'opération continuerait à être efficace (contrairement à si j'enlevais la row "Virgile" à partir de son index).
 df = df.drop(df[df["birthDate"].str.len() > 4].index)
 
 # Regarder s'il y a des valeurs qui, au contraire, ont moins que 4 caractères.
@@ -96,25 +96,25 @@ df[df["birthDate"].str.startswith("0")]
 plot = plt.bar(df.birthDate.value_counts())
 plot.show()
 
-# Une visualisation du nombres de naissances par années, classées dans l'ordre du temps, qui confirme que la population se situe très largement majoritairement dans les 20e et 19e siècle.
+# Une visualisation du nombres de naissances par années, classées dans l'ordre du temps, qui confirme que la population se situe très largement majoritairement dans les 20e et 19e siècles.
 plot = plt.bar(df.birthDate.value_counts().sort_index())
 plot.show()
 
-# Mais cette représentation est inappropriée, car les années sans naissances ne sont pas représentées, la représentation du temps est donc déformée, alors que nous voudrions les voir représentées avec la valeur 0. Pour ça, je vais utiliser la fonction "range()" qui permet de créer une séquence de nombre. Il me faut préalablement convertir les éléments de ma liste, qui sont des chaînes de caractères (str) en entier (int).
+# Mais cette représentation est inadéquate, car les années sans naissances ne sont pas représentées, la représentation du temps est donc déformée, alors que nous voudrions les voir représentées avec la valeur 0. Pour ça, je vais utiliser la fonction "range()" qui permet de créer une séquence de nombre. Il me faut préalablement convertir les éléments de ma liste, qui sont des chaînes de caractères (str) en entier (int).
 years = [(int(i), j) for i, j in df.birthDate.value_counts().items()]
 years[:10]
 
-# Méthode .sort() pour mettre les années dans l'ordre chronologique (et non pas dans l'ordre de leur valeur -- "j"  dans la liste telle que décrite ci-dessus).
+# J'utilise la méthode .sort() pour mettre les années dans l'ordre chronologique (car elles sont pour l'instant classées par valeur, par nombre de naissances).
 years.sort()
 
-# Le début et la fin de la séquences.
+# Le début et la fin de la séquences, utilisées comme bornes.
 year_start = years[0][0]
 year_end = years[-1][0]
 
-# Construire, pour les besoin de la visualisation, la liste de toutes les années, y compris celles sans naissances, en faisant une liste
+# Je construis, pour les besoin de la visualisation, la liste de toutes les années, y compris celles sans naissances, en faisant une liste
 years_all = [i for i in range(int(year_start), int(year_end) + 1, 1)]
 
-# Déclaration d'une nouvelle liste. Je la remplis en prenant une à une toutes les années de la séquences des années (years_all), et en récupérant le nombre des naissances dans la variable 'years' qui contient les années associées aux nombres de naissances -- variable convertie en dictionnaire (dict()) pour utiliser l'année comme clé permettant de récupérer la valeur associée. Si l'année ne se trouve pas dans la variable 'years', c'est que le nombre de naissances est de 0.
+# Déclaration d'une nouvelle liste. Je la remplis en prenant une à une toutes les années de la séquences des années (years_all), et en récupérant le nombre des naissances dans la variable 'years' qui contient les années associées aux nombres de naissances. Si l'année ne se trouve pas dans la variable 'years', c'est que le nombre de naissances est de 0.
 y = []
 for i in years_all:
     if i in dict(years):
@@ -126,7 +126,7 @@ for i in years_all:
 print(y[:10])
 print(y[-10:])
 
-# Une nouvelle visualisation avec les années vides (0 naissances). Cette visualisation est peu lisible, mais montre avec une évidence extrême la concentration de la population dans les 19e et 20e siècles. Les individus nés avant le 16e siècle sont en nombre très faible. Cela provient naturellement en partie des sources disponibles, mais reflette aussi, pour la période médiévale en particulier, le statut très différents de la production littéraire: c'est seulement à l'époque moderne, et plus encore à partir des 18e et 19e siècles, sous l'influence de la pensée romantique, que la "création" artistique et littéraire est associée à des individus particuliers.
+# Une nouvelle visualisation avec les années vides (0 naissances). Cette visualisation est peu lisible, mais montre avec une évidence extrême la concentration de la population dans les 19e et 20e siècles. Les individus nés avant le 16e siècle sont en nombre très faible. Cela provient naturellement en partie des sources disponibles, mais reflette aussi, pour la période médiévale en particulier, le statut très différent de la production littéraire: c'est seulement à l'époque moderne, et plus encore à partir des 18e et 19e siècles, sous l'influence de la pensée romantique, que la production artistique et littéraire est conçue comme "création" et associée à des individus particuliers, lesquels individus "expriment" leur individualité dans leurs oeuvres.
 plot = plt.bar(x=[i[0] for i in y], y=[i[1] for i in y])
 plot.show()
 
@@ -137,7 +137,7 @@ plot = plt.bar(
 )
 plot.show()
 
-# On peut voir que les pics de naissances des individus répertoriés de la population se trouvent vers le milieu du 20e siècle, entre les années 40 et les années 60. On peut expliquer cela par au moins deux choses: le fait que Wikipedia présente de façon générale davantage d'informations sur des personnes proches de nous dans le temps; et le fait que la reconnaissance par le champ littéraire, qui est un préalable à la recension d'un individu en tant que "Writer" ou "Poète" est un processus qui s'accomplit avec un certain délai: il est donc assez naturel que les personnes nées depuis les années 1990 soient en nombre aussi faible. À cela on peut encore ajouter deux choses: le fait que l'entrée dans le champ littéraire puisse être tardive dans la vie d'un individu; et le fait que la recherche en littératures à l'université se concentrait jusqu'à récemment sur des auteurices décédées, sur lesquel-les un recul plus important pouvait être pris.
+# On peut voir que les pics de naissances des individus répertoriés de la population se trouvent vers le milieu du 20e siècle, entre les années 40 et les années 60. On peut expliquer cela par au moins deux choses: le fait que Wikipedia présente de façon générale davantage d'informations sur des personnes proches de nous dans le temps; et le fait que la reconnaissance par le champ littéraire, qui est un préalable à la recension d'un individu en tant que "Writer" ou "Poet" est un processus qui s'accomplit avec un certain délai: il est donc assez naturel que les personnes nées depuis les années 1990 soient en nombre aussi faible. À cela on peut encore ajouter deux choses: le fait que l'entrée dans le champ littéraire puisse être tardive dans la vie d'un individu; et le fait que la recherche en littératures à l'université se concentrait jusqu'à récemment sur des auteurices décédées, sur lesquel-les un recul plus important pouvait être pris.
 
 # Une dernière représentation, par tranche de 10 ans. Pour la construire, je rassemble les années en écartant leur dernier nombre et en le remplaçant par 0 et en additionnant les valeurs des années ainsi regroupées.
 w = dict([[i, 0] for i in range(1860, 2001, 10)])
@@ -158,6 +158,4 @@ for i in test_a, test_b, test_c:
 
 # Exécuter la même opération sur mes données. Le résultat obtenu montre encore une fois que la population est largement issue des derniers siècles.
 sum([int(i) for i in df.birthDate]) / len(df.birthDate)
-
-# Exprimé sous forme d'écart 
-print(2023 - sum([int(i) for i in df.birthDate]) / len(df.birthDate), " d'années d'écart avec le présent (2023)")
+print("->", 2023 - int(sum([int(i) for i in df.birthDate]) / len(df.birthDate)), "années d'écart avec le présent (2023)")
