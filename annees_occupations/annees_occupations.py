@@ -1,17 +1,3 @@
-# ---
-# jupyter:
-#   jupytext:
-#     text_representation:
-#       extension: .py
-#       format_name: light
-#       format_version: '1.5'
-#       jupytext_version: 1.14.5
-#   kernelspec:
-#     display_name: py310_data_analysis
-#     language: python
-#     name: py310_data_analysis
-# ---
-
 import pandas as pd
 import plotly.express as px
 
@@ -20,31 +6,65 @@ import scipy.stats as stats
 import numpy as np
 import csv
 
-init_notebook_mode(all_interactive=False)
+# Carnet qui étudie la relation entre deux propriétés: 
+# 1. année de naissance; 
+# 2. occupation.
 
-### Construire un CSV commun à partir des CSV birthdate / occupations
-
+# La première étape est de réunir les données des deux CSV.
+# Ouvrir les csv:
 def file_to_list(fp):
+    """
+    Retourne une liste (sans saut de ligne) à partir d'un fichier.
+    """
     a = []
     with open(fp) as f:
         c = f.readlines()
         for i in c:
-            a.append(i.replace('"', '').replace('\n', '').replace('http://dbpedia.org/resource/', ''))
-    return(a)
+            a.append(
+                    i
+                    .replace('"', '')
+                    .replace('\n', '')
+                    .replace('http://dbpedia.org/resource/', '')
+                    )
+    return a
 
-# ouvrir les csv
 fp_a = '../data/dbpedia/dbpedia_poets_birthdate.csv'
 fp_b = '../data/dbpedia/poets_occupations.csv'
 c_a = file_to_list(fp_a)
 c_b = file_to_list(fp_b)
 
-# faire un dictionnaire avec les données du premier csv (birthdate)
-tmp_c = {} # dict vide
+# Le début des deux listes:
+c_a[:5]
+c_a[:5]
+
+# Un souci à régler: les URIs contiennent parfois des virgules:
+for i in c_a:
+    if i.count(',') > 1:
+        print(i)
+
+# On le retrouve dans les deux CSV
+for i in c_b:
+    if i.count(',') > 1:
+        print(i)
+
+# La virgule problématique est toujours la première.
+# La solution est donc simplement de remplacer 
+# la première virgule par rien
+# quand il y a deux virgules.
+for i in c_a:
+    if i.count(',') > 1:
+        new_i = i.replace(',', '', 1)
+        print(i, new_i)
+
+
+# Faire un dictionnaire avec les données du premier csv (birthdate)
+tmp_c = {}
 # iterate les birthdate
-for i in c_a[1:]: # enlever la premiere ligne (titres des colonnes)
-    j = i.split(',') # faire une liste
+for i in c_a[1:]: # enlever la premiere ligne (noms des colonnes)
+    j = i.split(',') # faire des sous-listes
     tmp_c[j[0]] = {} # chaque individu donne lieu à une dictionnaire
-    tmp_c[j[0]]['birthdate'] = j[1][:4] # dans chaque dict-individu, une entrée "birthdate"
+    tmp_c[j[0]]['birthdate'] = j[1][:4] 
+    # dans chaque dict-individu, une entrée "birthdate"
 
 # iterate les birthplace
 for i in c_b[1:]:
