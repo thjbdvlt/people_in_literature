@@ -60,9 +60,6 @@ len(set(occupations))
 
 # Pour la suite de l'exploration de ces données, l'objectif est d'observer les différences dans les activités annexes à l'activité de création littéraire entre les sous-groupes que constituent les "poets", les "dramatists" et les "novelists" qui constituent les trois genres dominants de la production littéraire occidentale moderne. Je n'intègre pas l'essai ni l'autobiographie, qui représentent des cas à part et sont difficiles à distinguer de pratiques non-littéraires en raison de leur caractère non-fictionnel (ex. les autobiographie de star, ou les essais de développement personnel). L'idée est de voir si certaines activités annexes sont sur- ou sous-représentrées dans certains de ces sous-groupes. Par exemple, trouve-t-on davantages de personnes exerçant des activités religieuses ou mystiques chez les poètes-ses que chez les dramaturges? À l'inverse, les dramaturges ont-iels en revanche plus tendance que les poète-sses à écrire pour le cinéma, et les romancier-ères pour la presse écrite? Les poètes font-iels plus de musique, les romancier-ères plus de peinture?
 
-# Pour pouvoir plus facilement faire ces regroupement, je passe toute la casse en minuscule dans les occupations.
-df.occupation.str.lower()
-
 occupations_grouped = {
     # Une première catégorie assez générale concerne les activités intellectuelles et en particulier les activités de recherche universitaire. Avec deux sous-catégories: sciences sociales; sciences expérimentales.
     "intellectual": [
@@ -128,7 +125,28 @@ occupations_grouped = {
     ],
     "education": ["school", "teach", "pedag", "educ"],
     # Enfin, la traduction constitue une activité à part, à laquelle s'adonne de nombreuxses écrivain-es. C'est pourquoi j'en fais une activité à part entière.
-    "translation": ["transl"]
+    "translation": ["transl"],
 }
 
-occupation_and_group = [(i[1], i[2]) for i in df.values]
+# Je mets en caractères minuscules les occupations, afin de pouvoir effectuer plus facilement les comparaison avec les mots déterminés ci-dessus. Je construis une nouvelle liste à double éléments: l'occupation et la "writing_class" (Novelist, Poet, Dramatist, Writer).
+occupation_and_group = [(i[1].lower(), i[2]) for i in df.values]
+occupation_and_group[:10]
+
+# À travers un enchâssement de boucles, je compte, pour chaque "writing_class", combien de lignes correspondent à chacun de ces groupes d'occupations (politic, education, etc.).
+count = {}
+for i in writing_classes:
+    count[i] = {}
+    for word_group in occupations_grouped:
+        count[i][word_group] = 0
+        for row in [r for r in occupation_and_group if r[1] == i]:
+            for word in occupations_grouped[word_group]:
+                if word in row[0]:
+                    count[i][word_group] = count[i][word_group] + 1
+                    break
+count
+
+# Les données peuvent être remises dans un DataFrame pandas:
+occount = pandas.DataFrame(count)
+occount
+
+# Un rapide regard des données donne déjà des informations intéressantes. Par exemple, l'activité de traduction, qui est une activité importante des poètes modernistes et contemporain, apparaît nettement comme une spécificité de ce groupe.
