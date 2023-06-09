@@ -4,13 +4,11 @@ Observation de la distribution des naissances de la population.
 
 import sparql_dataframe
 import plotly.express as plt
-import pandas
 
-
-# L'adresse de DBPedia, où la requête sera adressée
+# L'adresse de DBPedia, où la requête sera adressée.
 dbpedia = "http://dbpedia.org/sparql"
 
-# La requête SPARQL
+# La requête SPARQL.
 query = """
 PREFIX dbo: <http://dbpedia.org/ontology/>
 PREFIX dbr: <http://dbpedia.org/resource/>
@@ -23,7 +21,7 @@ WHERE {
   }
   UNION
   {
-  ?person ?p dbo:Poet ;
+    ?person ?p dbo:Writer ;
             dbo:birthDate ?birthDate .
   }
   UNION
@@ -59,11 +57,6 @@ WHERE {
   UNION
   {
   ?person ?p dbo:Anthologist ;
-            dbo:birthDate ?birthDate .
-  }
-  UNION
-  {
-    ?person ?p dbo:Writer ;
             dbo:birthDate ?birthDate .
   }
 }
@@ -104,7 +97,7 @@ df[df["birthDate"].str.startswith("0")]
 plot = plt.bar(df.birthDate.value_counts())
 plot.show()
 
-# Une visualisation du nombres de naissances par années, classées dans l'ordre du temps, qui confirme que la population se situe très largement majoritairement dans les XXe et XIXe siècle.
+# Une visualisation du nombres de naissances par années, classées dans l'ordre du temps, qui confirme que la population se situe très largement majoritairement dans les 20e et 19e siècle.
 plot = plt.bar(df.birthDate.value_counts().sort_index())
 plot.show()
 
@@ -134,13 +127,22 @@ for i in years_all:
 y[:10]
 y[-10:]
 
-# Une nouvelle visualisation avec les années vides (0 naissances). Cette visualisation est illisible.
+# Une nouvelle visualisation avec les années vides (0 naissances). Cette visualisation est peu lisible, mais montre avec une évidence extrême la concentration de la population dans les 19e et 20e siècles.
 plot = plt.bar(x=[i[0] for i in y], y=[i[1] for i in y])
 plot.show()
 
-# Je vais resserrer un peu, et ne me concentrer que sur le vingtième siècle. On peut voir que les pics de naissances des individus répertoriés de la population se trouvent vers le milieu du siècle, entre les années 40 et les années 60. On peut expliquer cela par au moins deux choses: le fait que Wikipedia présente de façon générale davantage d'informations sur des personnes proches de nous dans le temps; et le fait que la reconnaissance par le champ littéraire, qui est un préalable à la recension d'un individu en tant que "Writer" ou "Poète" est un processus qui s'accomplit avec un certain délai: il est donc assez naturel que les personnes nées depuis les années 1990 soient en nombre aussi faible. À cela on peut encore ajouter deux choses: le fait que l'entrée dans le champ littéraire puisse être tardive dans la vie d'un individu; et le fait que la recherche en littératures à l'université se concentrait jusqu'à récemment sur des auteurices décédées, sur lesquel-les un recul plus important pouvait être pris.
+# Je vais resserrer un peu, et ne me concentrer que sur le 20e siècle. On peut voir que les pics de naissances des individus répertoriés de la population se trouvent vers le milieu du siècle, entre les années 40 et les années 60. On peut expliquer cela par au moins deux choses: le fait que Wikipedia présente de façon générale davantage d'informations sur des personnes proches de nous dans le temps; et le fait que la reconnaissance par le champ littéraire, qui est un préalable à la recension d'un individu en tant que "Writer" ou "Poète" est un processus qui s'accomplit avec un certain délai: il est donc assez naturel que les personnes nées depuis les années 1990 soient en nombre aussi faible. À cela on peut encore ajouter deux choses: le fait que l'entrée dans le champ littéraire puisse être tardive dans la vie d'un individu; et le fait que la recherche en littératures à l'université se concentrait jusqu'à récemment sur des auteurices décédées, sur lesquel-les un recul plus important pouvait être pris.
 plot = plt.bar(
     x=[i[0] for i in y if i[0] > 1880],
     y=[i[1] for i in y if i[0] > 1880],
 )
+plot.show()
+
+# Une dernière représentation, par tranche de 10 ans. Pour la construire, je rassemble les années en écartant leur dernier nombre et en le remplaçant par 0 et en additionnant les valeurs des années ainsi regroupées.
+w = dict([[i, 0] for i in range(1880, 2001, 10)])
+for i in y:
+    if i[0] > 1879:
+        j = int(f'{str(i[0])[:3]}0')
+        w[j] = w[j] + i[1]
+plot = plt.bar(x=w.keys(), y=w.values())
 plot.show()
