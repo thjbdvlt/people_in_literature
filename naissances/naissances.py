@@ -9,58 +9,58 @@ import plotly.express as plt
 dbpedia = "http://dbpedia.org/sparql"
 
 # La requête SPARQL.
-query = """
-PREFIX dbo: <http://dbpedia.org/ontology/>
-PREFIX dbr: <http://dbpedia.org/resource/>
-
-SELECT DISTINCT ?person ?birthDate
-WHERE {
-  {
-  ?person ?p dbr:Novelist ;
-            dbo:birthDate ?birthDate .
-  }
-  UNION
-  {
-    ?person ?p dbo:Writer ;
-            dbo:birthDate ?birthDate .
-  }
-  UNION
-  {
-    ?person ?p dbo:Poet ;
-            dbo:birthDate ?birthDate .
-  }
-  UNION
-  {
-    ?person ?p dbo:Dramatist ;
-            dbo:birthDate ?birthDate .
-  }
-  UNION
-  {
-    ?person ?p dbo:Translator ;
-            dbo:birthDate ?birthDate .
-  }
-  UNION
-  {
-    ?person ?p dbo:Librarian ;
-            dbo:birthDate ?birthDate .
-  }
-  UNION
-  {
-    ?person ?p dbo:Editor ;
-            dbo:birthDate ?birthDate .
-  }
-  UNION
-  {
-    ?person ?p dbo:Critic ;
-            dbo:birthDate ?birthDate .
-  }
-  UNION
-  {
-  ?person ?p dbo:Anthologist ;
-            dbo:birthDate ?birthDate .
-  }
-}
-"""
+query = (
+    "PREFIX dbo: <http://dbpedia.org/ontology/>\n"
+    "PREFIX dbr: <http://dbpedia.org/resource/>\n"
+    "\n"
+    "SELECT DISTINCT ?person ?birthDate\n"
+    "WHERE {\n"
+    "  {\n"
+    "  ?person ?p dbr:Novelist ;\n"
+    "            dbo:birthDate ?birthDate .\n"
+    "  }\n"
+    "  UNION\n"
+    "  {\n"
+    "    ?person ?p dbo:Writer ;\n"
+    "            dbo:birthDate ?birthDate .\n"
+    "  }\n"
+    "  UNION\n"
+    "  {\n"
+    "    ?person ?p dbo:Poet ;\n"
+    "            dbo:birthDate ?birthDate .\n"
+    "  }\n"
+    "  UNION\n"
+    "  {\n"
+    "    ?person ?p dbo:Dramatist ;\n"
+    "            dbo:birthDate ?birthDate .\n"
+    "  }\n"
+    "  UNION\n"
+    "  {\n"
+    "    ?person ?p dbo:Translator ;\n"
+    "            dbo:birthDate ?birthDate .\n"
+    "  }\n"
+    "  UNION\n"
+    "  {\n"
+    "    ?person ?p dbo:Librarian ;\n"
+    "            dbo:birthDate ?birthDate .\n"
+    "  }\n"
+    "  UNION\n"
+    "  {\n"
+    "    ?person ?p dbo:Editor ;\n"
+    "            dbo:birthDate ?birthDate .\n"
+    "  }\n"
+    "  UNION\n"
+    "  {\n"
+    "    ?person ?p dbo:Critic ;\n"
+    "            dbo:birthDate ?birthDate .\n"
+    "  }\n"
+    "  UNION\n"
+    "  {\n"
+    "  ?person ?p dbo:Anthologist ;\n"
+    "            dbo:birthDate ?birthDate .\n"
+    "  }\n"
+    "}"
+)
 
 # Faire la requête et stocker ses résultats dans un DataFrame Pandas
 df = sparql_dataframe.get(dbpedia, query)
