@@ -145,20 +145,13 @@ for i in y:
 plot = plt.bar(x=w.keys(), y=w.values())
 plot.show()
 
-# Quoi que fabriquer une 'moyenne' sur la base d'années puisse sembler une opération vide de sens (puisque un année de naissances n'est pas une propriété quantitative) du moins assez artificielle, je vais quand même le faire car il s'agit d'une manière simple de voir, une fois encore, vers où tendent à être né-es les membres de la population. Afin de m'assurer que cela n'est pas complétement absurde, je vais réaliser d'abord un petit test, lequel test montre bien que faire la moyenne des années permet de connaitre le point central autour duquel s'organise les naissances. Par ailleurs, il est toujours possible de reformuler l'année de naissance de façon à en faire une propriété quantitative, par exemple en tant qu'écart entre l'année de naissance de la personne et aujourd'hui ("1920" deviendrait "83 ans d'écart", "1955" deviendrait "78 ans d'écart") -- propriété quantitative puisque contrairement à une année de naissance, il est courant de dire qu'un écart est plus grand ou plus petit qu'un autre.
+# Quoi que fabriquer une 'moyenne' sur la base d'années puisse sembler une opération vide de sens (puisque un année de naissances n'est pas une propriété quantitative) du moins assez artificielle, je vais quand même le faire car il s'agit d'une manière simple de voir, une fois encore, vers où tendent à être né-es les membres de la population. Afin de m'assurer que cela n'est pas complétement absurde, je vais réaliser d'abord un petit test, lequel test montre bien que faire la moyenne des années permet de connaitre le point central autour duquel s'organise les naissances. Par ailleurs, il est toujours possible de reformuler l'année de naissance de façon à en faire une valeur quantitative, par exemple en tant qu'écart entre l'année de naissance de la personne et aujourd'hui ("1920" deviendrait "83 ans d'écart", "1955" deviendrait "78 ans d'écart") -- propriété quantitative puisque contrairement à une année de naissance, il est courant de dire qu'un écart est plus grand ou plus petit qu'un autre.
 test_a = [0, 0, 0, 2000]
 test_b = [1800, 2000, 0, 0]
 test_c = [1900, 1910, 1920, 2000]
 for i in test_a, test_b, test_c:
-    a = 0
-    for j in i:
-        a = a + j
-    a = a / len(i)
-    a
+    a = sum(i) / len(i)
+    print(a)
 
 # Exécuter la même opération sur mes données. Le résultat obtenu montre encore une fois que la population est largement issue des derniers siècles.
-a = 0
-for i in df.birthDate:
-    a = a + int(i)
-a = a / len(df.birthDate)
-a
+sum([int(i) for i in df.birthDate]) / len(df.birthDate)
