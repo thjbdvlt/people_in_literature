@@ -82,7 +82,7 @@ df["birthDate"].replace(
 # Observer les valeurs extrêmes, pour éviter les problèmes futurs et pour pouvoir s'assurer d'une homogénéité des données (et de leur type). On voit qu'une personne, Virgile, a une date dont le format est différent. Puisqu'il s'agit de la seule valeur négative, je l'enlève des données.
 df.birthDate.sort_values()
 
-# L'opération que j'utilise pour homogénéiser les valeur consiste à enlever les rows dans lequelles la valeur de birthDate est plus grande que 4 caractères.
+# L'opération que j'utilise pour homogénéiser les valeur consiste à enlever les rows dans lequelles la valeur de birthDate est plus grande que 4 caractères. De cette façon, si les données se trouvaient modifiées pour une raison quelconque, l'opération continuerait à être efficace (contrairement à si j'enlevais la row à partir de son index).
 df = df.drop(df[df["birthDate"].str.len() > 4].index)
 
 # Regarder s'il y a des valeurs qui, au contraire, ont moins que 4 caractères.
@@ -90,8 +90,6 @@ df[df["birthDate"].str.len() < 4]
 
 # Comme il n'y en a pas, regarder s'il y en a qui commencent par "0".
 df[df["birthDate"].str.startswith("0")]
-
-# Les années qui ont le plus de naissances, et celles qui en ont le moins.
 
 # Une première représentation, des années qui ont le plus de naissances et de celles qui en ont le moins. Quoique cette représentation ne soit pas vraiment appropriée, elle nous permet déjà de voir que les naissances augmentent à mesure qu'on se rapproche de nous dans le temps: l'axe des x a un air approximativement décroissant.
 plot = plt.bar(df.birthDate.value_counts())
@@ -131,15 +129,15 @@ y[-10:]
 plot = plt.bar(x=[i[0] for i in y], y=[i[1] for i in y])
 plot.show()
 
-# Je vais resserrer un peu, et ne me concentrer que sur le 20e siècle. On peut voir que les pics de naissances des individus répertoriés de la population se trouvent vers le milieu du siècle, entre les années 40 et les années 60. On peut expliquer cela par au moins deux choses: le fait que Wikipedia présente de façon générale davantage d'informations sur des personnes proches de nous dans le temps; et le fait que la reconnaissance par le champ littéraire, qui est un préalable à la recension d'un individu en tant que "Writer" ou "Poète" est un processus qui s'accomplit avec un certain délai: il est donc assez naturel que les personnes nées depuis les années 1990 soient en nombre aussi faible. À cela on peut encore ajouter deux choses: le fait que l'entrée dans le champ littéraire puisse être tardive dans la vie d'un individu; et le fait que la recherche en littératures à l'université se concentrait jusqu'à récemment sur des auteurices décédées, sur lesquel-les un recul plus important pouvait être pris.
+# Je vais resserrer un peu, et ne me concentrer que sur la période moderniste, que je vais faire commencer en 1860, entre la publication par Baudelaire des 'Fleurs du mal' (1857) et de 'Un peintre de la vie moderne' (1863), deux textes fondamentaux pour la notion de modernité en littérature. On peut voir que les pics de naissances des individus répertoriés de la population se trouvent vers le milieu du siècle, entre les années 40 et les années 60. On peut expliquer cela par au moins deux choses: le fait que Wikipedia présente de façon générale davantage d'informations sur des personnes proches de nous dans le temps; et le fait que la reconnaissance par le champ littéraire, qui est un préalable à la recension d'un individu en tant que "Writer" ou "Poète" est un processus qui s'accomplit avec un certain délai: il est donc assez naturel que les personnes nées depuis les années 1990 soient en nombre aussi faible. À cela on peut encore ajouter deux choses: le fait que l'entrée dans le champ littéraire puisse être tardive dans la vie d'un individu; et le fait que la recherche en littératures à l'université se concentrait jusqu'à récemment sur des auteurices décédées, sur lesquel-les un recul plus important pouvait être pris.
 plot = plt.bar(
-    x=[i[0] for i in y if i[0] > 1880],
-    y=[i[1] for i in y if i[0] > 1880],
+    x=[i[0] for i in y if i[0] > 1860],
+    y=[i[1] for i in y if i[0] > 1860],
 )
 plot.show()
 
 # Une dernière représentation, par tranche de 10 ans. Pour la construire, je rassemble les années en écartant leur dernier nombre et en le remplaçant par 0 et en additionnant les valeurs des années ainsi regroupées.
-w = dict([[i, 0] for i in range(1880, 2001, 10)])
+w = dict([[i, 0] for i in range(1860, 2001, 10)])
 for i in y:
     if i[0] > 1879:
         j = int(f'{str(i[0])[:3]}0')
