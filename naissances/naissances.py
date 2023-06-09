@@ -139,7 +139,7 @@ plot.show()
 # Une dernière représentation, par tranche de 10 ans. Pour la construire, je rassemble les années en écartant leur dernier nombre et en le remplaçant par 0 et en additionnant les valeurs des années ainsi regroupées.
 w = dict([[i, 0] for i in range(1860, 2001, 10)])
 for i in y:
-    if i[0] > 1879:
+    if i[0] > 1859:
         j = int(f'{str(i[0])[:3]}0')
         w[j] = w[j] + i[1]
 plot = plt.bar(x=w.keys(), y=w.values())
