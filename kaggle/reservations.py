@@ -4,7 +4,6 @@ Exploration d'une jeu de données de réservations d'hôtel issu du site Kaggle.
 
 import calendar
 
-
 # Je place le contenu du csv dans un fichier, en tant que liste (liste de lignes: chaque ligne est une réservation.)
 csvpath = "./hotel_reservations.csv"
 with open(csvpath, "r") as f:
@@ -236,6 +235,31 @@ total = len(csv[1:])
 for i in d.keys():
     print(i, ":", d[i])
 
-# Parmi les réservations avec enfant, la proportion de réservation avec place de parking est plus importante que la proportion de réservation avec place de parc dans l'ensemble des réservations. Mais je ne saurais trop juger si cela est significatif.(Il faudrait probablement utiliser ici le test statistique du Chi-2.)
-print(round(d['children, parking'] / d['children'], 3))
-print(round(d['parking'] / total, 3))
+# Parmi les réservations avec enfant, la proportion de réservation avec place de parking est plus importante que la proportion de réservation avec place de parc dans l'ensemble des réservations. Mais je ne saurais trop juger si cela est significatif. (Il faudrait probablement utiliser ici le test statistique du Chi-2.) L'écart est tout de même assez faible, mais il y a quand même un peu moins du double de demande de place de parking dans les réservations avec enfant. Et surtout, la différence est au moins dans la bonne direction (plus de demande de place de parking dans les réservations avec enfants). Il me semble donc pertinent de continuer à explorer cette relation.
+print(round(d["children, parking"] / d["children"], 3))
+print(round(d["parking"] / total, 3))
+
+# Puisque mon hypothèse partait initialement du mois d'aout, je vais essayer de voir ce qu'il en est de cette différence pour ce mois. Je commence par stocker dans une variable les clés des réservations qui concernent le mois d'aout.
+months = query_valeur_id("arrival_month")
+august = months["8"]
+
+# Je construis une autre variable (sous-groupe de la précédente), dans laquelle je stocke les id des réservations qui (1) concerne le mois d'aout ET ont des valeurs non-nulles concernant la présence d'enfant et la demande d'une place de parking.
+august_and_children_and_parking = [
+    i for i in august if with_children(i) and with_parking(i)
+]
+
+# La différence ici me semble beaucoup plus significative.
+print(
+    "enfant + parking au mois d'aout:",
+    round(len(august_and_children_and_parking) / len(august), 4),
+)
+print(
+    "enfant + parking dans l'ensemble de l'année:",
+    round(d["children, parking"] / total, 4),
+)
+print(
+    "->",
+    round(
+        (len(august_and_children_and_parking) / len(august)) /
+        (d["children, parking"] / total), 3)
+)
