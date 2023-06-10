@@ -143,7 +143,7 @@ p.reverse()
 for n, m in p:
     print(m, ":", n)
 
-# Une explication possible aurait pu être un nombre de place limité de places de parking, qui plafonnerait le nombre absolu de demande pour des places de parking et réduirait donc mécaniquement la proportion de demande pour une place de parc pour les mois avec le plus de demande. Mais on peut probablement écarter cela, puisque le nombre le plus haut de demande de réservation en un mois est de 222 et que le nombre de réservation en octobre est très largement inférieur. Il faudrait toutefois, si l'on voulait s'en assurer, étudier les dates de réservations et non les mois, pour voir le nombre le plus haut de réservations simultanées de places de parking. Une hypothèse que je formule à partir de ces résultats: les réservations de place de parking sont corrélées avec le nombre d'enfants. Des vacances d'été (s'il y en a dans le pays dans lequel se trouve cet hôtel, où dans les pays dans lesquels vivent ses clients) dans une période (disons) standardisée pour l'ensemble d'une population pourrait être une explication pour ces disparités. Je commence par faire la même opération mais avec la colonne "no_of_children".
+# Une explication possible aurait pu être un nombre de place limité de places de parking, qui plafonnerait le nombre absolu de demande pour des places de parking et réduirait donc mécaniquement la proportion de demande pour une place de parc pour les mois avec le plus de réservations. Mais on peut probablement écarter cela, puisque le nombre le plus haut de demande de réservation en un mois est de 222 et que le nombre de réservation en octobre est très largement inférieur (94). Il faudrait toutefois, si l'on voulait s'en assurer, étudier les dates de réservations et non les mois, pour voir le nombre le plus haut de réservations simultanées de places de parking. Une hypothèse que je formule à partir de ces résultats: les réservations de place de parking sont corrélées avec le nombre d'enfants. Des vacances d'été (s'il y en a dans le pays dans lequel se trouve cet hôtel, où dans les pays dans lesquels vivent ses clients) dans une période (disons) standardisée pour l'ensemble d'une population pourrait être une explication pour ces disparités. Je commence par faire la même opération mais avec la colonne "no_of_children".
 months = query_valeur_id("arrival_month")
 children = query_id_dict("no_of_children")
 b = {}
@@ -236,6 +236,6 @@ total = len(csv[1:])
 for i in d.keys():
     print(i, ":", d[i])
 
-# Parmi les réservations avec enfant, la proportion de réservation avec place de parking est plus importante que la proportion de réservation avec place de parc dans l'ensemble des réservations. Mais je ne saurais trop juger si cela est significatif. (Il faudrait évidemment utiliser ici le test statistique du Chi-2.)
-print(round(d['children, parking'] / d['children']))
-print(round(d['parking'] / total))
+# Parmi les réservations avec enfant, la proportion de réservation avec place de parking est plus importante que la proportion de réservation avec place de parc dans l'ensemble des réservations. Mais je ne saurais trop juger si cela est significatif.(Il faudrait probablement utiliser ici le test statistique du Chi-2.)
+print(round(d['children, parking'] / d['children'], 3))
+print(round(d['parking'] / total, 3))
