@@ -2,21 +2,20 @@
 Exploration d'une jeu de données de réservations d'hôtel issu du site Kaggle.
 """
 
-
-from collections import Counter
 import calendar
 
 
-# Je lis le contenu du csv.
+# Je place le contenu du csv dans un fichier, en tant que liste (liste de lignes: chaque ligne est une réservation.)
 csvpath = "./hotel_reservations.csv"
 with open(csvpath, "r") as f:
     csv = f.readlines()
 
-# Je transforme chaque ligne en une liste. L'ensemble est donc une liste de listes.
+# Je transforme chaque ligne en une liste. L'ensemble est donc une liste de listes. Chaque ligne est une liste de valeurs.
 csv = [line.split(",") for line in csv]
-csv[:1]
+for i in csv[:3]:
+    print(i)
 
-# Pour pouvoir plus facilement travailler, je transforme la liste de listes en dictionnaires de dictionnaires (nested dicts). L'ensemble est un dictionnaire, et chaque ligne du csv (= chaque réservation) va constituer un sous-dictionnaire, dont les clés correspondront aux entêtes du csv (les intitulés des colonnes)
+# Pour pouvoir plus facilement travailler, je transforme la liste de listes en dictionnaires de dictionnaires. L'ensemble est un dictionnaire, et chaque ligne du csv (chaque réservation) va constituer un sous-dictionnaire, dont les clés correspondront aux entêtes du csv (les intitulés des colonnes)
 c = {}
 for line in csv[1:]:
     no_reservation = line[0]
@@ -25,20 +24,17 @@ for line in csv[1:]:
     for no in colonnes:
         c[no_reservation][csv[0][no]] = line[no]
 
+# Aperçu de la structure, deux entrées:
+for j in [i for i in c.items()][:2]:
+    print(j)
 
-# Combien d'années différentes sont concernées par ces réservations?
-years = [c[i]["arrival_year"] for i in c.keys()]
-Counter(years)
-
-# Y a-t-il des réservations pour tous les mois de l'années?
-months = [c[i]["arrival_month"] for i in c.keys()]
-Counter(months)
-
-
-# Je crée quelques fonctions simples pour explorer quelques aspects de ces données.
+# Plus lisible:
+for k in [c[i] for i in c.keys()][1].keys():
+    print(k, ":", [c[i] for i in c.keys()][1][k])
 
 
-# Fonction qui retourne une liste de tuples: l'id de la réservation et la valeur d'une colonne à choix, entrée comme paramètre.
+# Je crée quelques fonctions simples pour explorer quelques aspects de ces données. 
+# Une fonction qui retourne une liste de tuples: l'id de la réservation et la valeur d'une colonne à choix, entrée comme paramètre.
 def query_id_col(col: str):
     a = [(i, c[i][col]) for i in c.keys()]
     return a
@@ -58,7 +54,7 @@ def query_valeur_nb(col: str):
     values = {}
     for i in a:
         if i[1] not in values.keys():
-            values[i[1]] = 0
+            values[i[1]] = 1
         else:
             values[i[1]] = values[i[1]] + 1
     return values
@@ -76,6 +72,12 @@ def query_valeur_id(col: str):
     return values
 
 
+# Combien d'années différentes sont concernées par ces réservations?
+query_valeur_nb('arrival_year')
+
+# Y a-t-il des réservations pour tous les mois de l'années?
+query_valeur_nb('arrival_month')
+
 # Question qui nous permettra peut-etre d'en apprendre davantage sur le type d'établissement: les saisons de réservations.
 months = query_valeur_nb("arrival_month")
 for m in months.keys():
@@ -92,14 +94,12 @@ for m in months_sorted:
 
 # Vraisemblablement, il ne s'agit pas d'un hôtel dont le public-cible est constitué de skieureuses. Les mois d'hivers et du début du printemps sont ceux pour lesquels il y a le moins de réservations.
 
-# La colonne "required_car_parking_space".
+# La colonne "required_car_parking_space" comporte deux valeurs possible: 0 ou 1, sans ou avec.
 query_valeur_nb("required_car_parking_space")
 
 # Le champ "required_car_parking_space" me semble être intéressant à croiser avec d'autres champs. Par exemple, y a-t-il un rapport entre le mois de la réservation et le fait d'avoir besoin d'une place de parking? Peut-être qu'en été les gens viennent à pieds dans cet hôtel.
 
 # Pour chaque mois, le nombre de réservation avec une place de parking, et le nombre de réservation sans place de parking.
-# months_id = query_id_dict("required_car_parking_space")
-# parking = query_valeur_id("required_car_parking_space")
 months = query_valeur_id("arrival_month")
 parking = query_id_dict("required_car_parking_space")
 a = {}
@@ -121,7 +121,7 @@ for i in months.keys():
 for i in a.keys():
     print(calendar.month_name[int(i)][:3], a[i])
 
-# Calculer l'écart.
+# Calculer l'écart entre les valeurs extrêmes.
 proportions = [a[i]["proportion"] for i in a.keys()]
 proportions.sort()
 print(
@@ -161,11 +161,7 @@ for i in months.keys():
     b[i]["total"] = b[i]["0"] + b[i]["1"]
     b[i]["proportion"] = round(b[i]["1"] / b[i]["total"], 3)
 
-# On peut voir des différences importantes dans les proportions de réservations avec voitures: de 0.018 par réservation en octobre à 0.058 en Aout.
-for i in b.keys():
-    print(calendar.month_name[int(i)][:3], b[i])
-
-# Calculer l'écart
+# Calculer l'écart entre les valeur extrêmes.
 proportions = [b[i]["proportion"] for i in b.keys()]
 proportions.sort()
 print(
@@ -183,33 +179,33 @@ q = [
 q.sort()
 q.reverse()
 
+# Print les résultats. Comme pour les places de parking, le mois avec, proportionnellement, le plus de réservation avec enfant est le mois d'aout.
 for n, m in q:
     print(m, ":", n)
 
-# Maintenant, essayer de voir si les familles avec enfant sont aussi les familles avec parking.
-months = query_valeur_id("arrival_month")
-parking = query_id_dict("required_car_parking_space")
-children = query_id_dict("no_of_children")
-c = {}
-for i in months.keys():
-    c[i] = {}
-    c[i]["np_nc"] = 0
-    c[i]["p_c"] = 0
-    c[i]["np_c"] = 0
-    c[i]["p_nc"] = 0
-    for r in months[i]:
-        if parking[r] == "0":
-            if children[r] == "0":
-                c[i]["np_nc"] = c[i]["np_nc"] + 1
-            elif int(children[r]) > 0:
-                c[i]["np_c"] = c[i]["np_c"] + 1
-        elif parking[r] != "0":
-            if children[r] == "0":
-                c[i]["p_nc"] = c[i]["p_nc"] + 1
-            elif int(children[r]) > 0:
-                c[i]["p_c"] = c[i]["p_c"] + 1
-    # a[i]["total"] = a[i]["0"] + a[i]["1"]
-    # a[i]["proportion"] = round(a[i]["1"] / a[i]["total"], 3)
-
-for i in c.keys():
-    print(calendar.month_name[int(i)][:3], c[i])
+# Maintenant, je vais essayer de voir si les familles avec enfant sont aussi les familles avec parking.
+# parking = query_id_dict("required_car_parking_space")
+# children = query_id_dict("no_of_children")
+# c = {}
+# for i in months.keys():
+#     c[i] = {}
+#     c[i]["np_nc"] = 0
+#     c[i]["p_c"] = 0
+#     c[i]["np_c"] = 0
+#     c[i]["p_nc"] = 0
+#     for r in months[i]:
+#         if parking[r] == "0":
+#             if children[r] == "0":
+#                 c[i]["np_nc"] = c[i]["np_nc"] + 1
+#             elif int(children[r]) > 0:
+#                 c[i]["np_c"] = c[i]["np_c"] + 1
+#         elif parking[r] != "0":
+#             if children[r] == "0":
+#                 c[i]["p_nc"] = c[i]["p_nc"] + 1
+#             elif int(children[r]) > 0:
+#                 c[i]["p_c"] = c[i]["p_c"] + 1
+#     # a[i]["total"] = a[i]["0"] + a[i]["1"]
+#     # a[i]["proportion"] = round(a[i]["1"] / a[i]["total"], 3)
+#
+# for i in c.keys():
+#     print(calendar.month_name[int(i)][:3], c[i])
