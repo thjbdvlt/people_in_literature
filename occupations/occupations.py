@@ -28,7 +28,7 @@ for i in writing_classes:
     )
     dataframe[i] = sparql_dataframe.get(dbpedia, queries[i])
     dataframe[i]["Group"] = i
-    print(len(dataframe[i]))
+    print(i, ':', len(dataframe[i]))
 
 # Assembler (concaténer) les dataframes en un seul dataframe.
 df = pandas.concat(dataframe.values())
@@ -153,27 +153,15 @@ count
 occount = pandas.DataFrame(count)
 occount
 
-# Un rapide regard des données donne déjà des informations intéressantes. Par exemple, l'activité de traduction, qui est une activité importante des poètes-ses modernistes et contemporain-es, apparaît nettement comme une spécificité de ce groupe. Ce n'est pas une surprise, pour plusieurs raisons: (1) la traduction de poésie s'accomplit plus rapidement et peut donc cohabiter plus facilement avec une activité d'écriture; (2) la traduction de la poésie pose des problèmes complexes qui la font souvent percevoir comme une forme de création à part entière et au premier degré, et de fait il y a des traductions célèbres de poésie (ex. Poe traduit par Baudelaire); (3) éventuellement, la recherche d'innovation linguistique, peut-être plus présente en poésie que dans l'écriture romanesque, pousserait davantage les poéte-sses à lire ce qui se fait ailleurs -- la recherche d'un écart avec le langage ordinaire (qui caractérise la poésie) peut également être une source de motivation à lire et faire circuler des textes en langue étrangère. Il s'agit également du seul groupe chez lequel le groupe d'occupation "press" est plus élevé que le groupe "non-written media". Ici encore, ce n'est pas surprenant: la poésie étant, contrairement aux écritures romanesque et dramatique, souvent non-narrative, les poètes ont naturellement moins de relation avec le cinéma (du moins le cinéma traditionnel, où leurs compétences s'exportent plus difficilement). Par ailleurs, peut-être les groupes ne sont-ils pas distribués de façon homoène dans le temps: il est possible que si les poètes-ses ont moins travaillé pour la télévision, c'est car la plupart des poètes-ses de mon jeu de données sont né-es et mort-es avant l'essor de la télévision.
+# Un rapide regard des données donne déjà des informations intéressantes. Par exemple, l'activité de traduction, qui est une activité importante des poètes-ses modernistes et contemporain-es, apparaît nettement comme une spécificité de ce groupe. Ce n'est pas une surprise, pour plusieurs raisons: (1) la traduction de poésie s'accomplit plus rapidement et peut donc cohabiter plus facilement avec une activité d'écriture; (2) la traduction de la poésie pose des problèmes complexes qui la font souvent percevoir comme une forme de création à part entière et au premier degré, et de fait il y a des traductions célèbres de poésie (ex. Poe traduit par Baudelaire); (3) éventuellement, la recherche d'innovation linguistique, peut-être plus présente en poésie que dans l'écriture romanesque, pousserait davantage les poéte-sses à lire ce qui se fait ailleurs -- la recherche d'un écart avec le langage ordinaire (qui caractérise la poésie) peut également être une source de motivation à lire et faire circuler des textes en langue étrangère. Il s'agit également du seul groupe chez lequel le groupe d'occupation "press" est plus élevé que le groupe "non-written media". Ici encore, ce n'est pas surprenant: la poésie étant, contrairement aux écritures romanesque et dramatique, souvent non-narrative, les poètes ont naturellement moins de relation avec le cinéma (du moins le cinéma traditionnel, où leurs compétences s'exportent plus difficilement). Par ailleurs, peut-être les groupes ne sont-ils pas distribués de façon homogène dans le temps: il est possible que si les poètes-ses ont moins travaillé pour la télévision, c'est car la plupart des poètes-ses de mon jeu de données sont né-es et mort-es avant l'essor de la télévision.
 
 # Ajouter une colonne "total" à droite afin de pouvoir plutôt travailler avec des nombres relatifs aux totaux.
 occount["total"] = occount.sum(axis=1)
 occount.loc["total"] = occount.sum(numeric_only=True, axis=0)
 occount
 
-# (Je raccourci le nom de la variable.)
-o = occount
-o
-
-# Le nombre d'occupation-traductrice par occupation-poètesse
-round(o.Poet.translation / o.Poet.total, 2)
-
-# Le nombre d'occupation-traductrice par occupation-romancière
-round(o.Novelist.translation / o.Novelist.total, 2)
-
-# Le nombre d'occupation-traductrice par occupation-dramaturge
-round(o.Dramatist.translation / o.Dramatist.total, 2)
-
-# Le nombre d'occupation-traductrice par occupation-écrivaine
-round(o.Writer.translation / o.Writer.total, 2)
+print('proportion de traduction:')
+for i in writing_classes:
+    print(i, ':', round(occount[i].translation / occount[i].total, 2))
 
 # La proportion d'occupation-traduction chez les poète-sses est largement supérieure à celles qu'on trouve chez les romancier-ères et dramaturges, lesquelles sont presque identiques (0.05, 0.06). Le rapport entre la proportion chez les poète-sses et chez les dramaturges, de 1/2, est identique au rapport entre dramaturge et writers, donc il pourrait sembler peu significatif. Mais cela n'est à mon avis pas le cas. Car la proportion plus basse chez les "Writers" s'explique autrement: en effet, ce groupe est constitué d'un nombre important d'auteurices identifié comme "writer" pour des activités non-littéraires, et qui n'ont pas la situation économique précaire des auteurices littéraires, puisque les Writers sont aussi des neurologistes reconnu-es publiant des essais de vulgarisation, etc. Il va de soit que l'activité de traduction dans ces catégorie socioprofessionnelle est une activité très secondaire; puisqu'elle ne constitue pas nécessairement leur compétence principale, les individus de ce groupe n'ont aucune raison de la mobiliser pour en faire une activité rémunératrice.
