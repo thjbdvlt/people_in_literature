@@ -248,7 +248,7 @@ august_and_children_and_parking = [
     i for i in august if with_children(i) and with_parking(i)
 ]
 
-# La différence ici me semble beaucoup plus significative.
+# La différence ici me semble beaucoup plus significative, et me semble pouvoir expliquer en partie le haut nombre de demande pour des places de parking au mois d'aout.
 print(
     "enfant + parking au mois d'aout:",
     round(len(august_and_children_and_parking) / len(august), 4),
@@ -260,6 +260,8 @@ print(
 print(
     "->",
     round(
-        (len(august_and_children_and_parking) / len(august)) /
-        (d["children, parking"] / total), 3)
+        (len(august_and_children_and_parking) / len(august))
+        / (d["children, parking"] / total),
+        3,
+    ),
 )
