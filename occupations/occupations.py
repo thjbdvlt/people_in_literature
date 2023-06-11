@@ -57,13 +57,12 @@ len(set(df.occupation))
 # Et certaines occupations identiques apparaissent sous des noms différents.
 [i for i in set(df.occupation) if i.startswith("Drama")]
 
-# Il faut donc procéder à des regroupements. Un tri manuel serait beaucoup trop laborieux, et poserait problème pour répéter l'opération si des nouveaux résultats venaient s'ajouter. Je vais donc opter plutôt pour une approche plus approximative mais permettant d'automatiser cette opération et de l'appliquer à des données en nombre important. L'idée est d'utiliser, comme dans l'exemple ci-dessus, la correspondance de motifs pour sélectionner et grouper des occupations. On peut par exemple grouper un certains nombres d'occupations qui se terminent en "gist", et qui, généralement, désignent des activités intellectuelles spécialisées et institutionalisées dans un cadre académique. Cette manière de faire est approximative et les résultats obtenus contiennent des erreurs (ex. Suffragist, Collagist), mais ça permet de travailler rapidement et avec une certaine souplesse dans l'éventualité où les données changeraient.
+# Il faut donc procéder à des regroupements. Un tri manuel serait beaucoup trop laborieux, et poserait problème pour répéter l'opération si des nouveaux résultats venaient s'ajouter. Je vais donc opter plutôt pour une approche plus approximative mais permettant d'automatiser cette opération et de l'appliquer à des données en nombre important. L'idée est d'utiliser, comme dans l'exemple ci-dessus, la correspondance de motifs pour sélectionner et grouper des occupations. On peut par exemple grouper un certains nombres d'occupations qui se terminent en "gist", et qui, généralement, désignent des activités intellectuelles spécialisées. Cette manière de faire est approximative et les résultats obtenus contiennent des erreurs (ex. Suffragist, Collagist), mais ça permet de travailler rapidement et avec une certaine souplesse dans l'éventualité où les données changeraient.
 [i for i in set(df.occupation) if re.search("gist$", i)]
 
-# Pour la suite de l'exploration de ces données, l'objectif est d'observer les différences dans les activités annexes à l'activité de création littéraire entre les sous-groupes que constituent les "poets", les "dramatists" et les "novelists" qui constituent les trois genres dominants de la production littéraire occidentale moderne. Je n'intègre pas l'essai ni l'autobiographie, qui représentent des cas à part et sont difficiles à distinguer de pratiques non-littéraires en raison de leur caractère non-fictionnel (ex. les autobiographie de star, ou les essais de développement personnel). L'idée est de voir si certaines activités annexes sont sur- ou sous-représentrées dans certains de ces sous-groupes. Par exemple, trouve-t-on davantages de personnes exerçant des activités religieuses ou mystiques chez les poètes-ses que chez les dramaturges? À l'inverse, les dramaturges ont-iels en revanche plus tendance que les poète-sses à écrire pour le cinéma, et les romancier-ères pour la presse écrite? Les poètes font-iels plus de musique, les romancier-ères plus de peinture?
+# Pour la suite de l'exploration de ces données, l'objectif est d'observer les différences dans les activités annexes à l'activité de création littéraire entre les sous-groupes que constituent les "poets", les "dramatists" et les "novelists" qui constituent les trois genres dominants de la production littéraire occidentale moderne. Je n'intègre pas l'essai ni l'autobiographie, qui représentent des cas à part et sont difficiles à distinguer de pratiques non-littéraires en raison de leur caractère non-fictionnel (ex. les autobiographie de star, ou les essais de développement personnel). L'idée est de voir si certaines activités annexes sont sur- ou sous-représentrées dans certains de ces sous-groupes. Par exemple, trouve-t-on davantages de personnes exerçant des activités religieuses ou mystiques chez les poète-sses que chez les dramaturges? À l'inverse, les dramaturges ont-iels en revanche plus tendance que les poète-sses à écrire pour le cinéma, et les romancier-ères pour la presse écrite? Les poète-sses font-iels plus de musique, les romancier-ères plus de peinture?
 
 occupations_grouped = {
-    # Une première catégorie assez générale concerne les activités intellectuelles et en particulier les activités de recherche universitaire. Avec deux sous-catégories: sciences sociales; sciences expérimentales.
     "intellectual": [
         "gist",
         "stud",
@@ -88,7 +87,6 @@ occupations_grouped = {
     ],
     "social sciences": ["socio", "anthro", "ethno", "hist"],
     "natural sciences": ["biol", "math", "phys", "chemis"],
-    # Un autre ensemble d'activité, les médias. Que je distingue en deux ensembles: médias imprimés (presse) et médias non-imprimés (télévision, radio, cinéma).
     "non-written media": [
         "radio",
         "screen",
@@ -126,7 +124,6 @@ occupations_grouped = {
         "juri",
     ],
     "education": ["school", "teach", "pedag", "educ"],
-    # Enfin, la traduction constitue une activité à part, à laquelle s'adonne de nombreuxses écrivain-es. C'est pourquoi j'en fais une activité à part entière.
     "translation": ["transl"],
 }
 
@@ -151,7 +148,7 @@ count
 occount = pandas.DataFrame(count)
 occount
 
-# Un rapide regard des données donne déjà des informations intéressantes. Par exemple, l'activité de traduction, qui est une activité importante des poètes-ses modernistes et contemporain-es, apparaît nettement comme une spécificité de ce groupe. Ce n'est pas une surprise, pour plusieurs raisons: (1) la traduction de poésie s'accomplit plus rapidement et peut donc cohabiter plus facilement avec une activité d'écriture; (2) la traduction de la poésie pose des problèmes complexes qui la font souvent percevoir comme une forme de création à part entière et au premier degré, et de fait il y a des traductions célèbres de poésie (ex. Poe traduit par Baudelaire); (3) éventuellement, la recherche d'innovation linguistique, peut-être plus présente en poésie que dans l'écriture romanesque, pousserait davantage les poéte-sses à lire ce qui se fait ailleurs -- la recherche d'un écart avec le langage ordinaire (qui caractérise la poésie) peut également être une source de motivation à lire et faire circuler des textes en langue étrangère. Il s'agit également du seul groupe chez lequel le groupe d'occupation "press" est plus élevé que le groupe "non-written media". Ici encore, ce n'est pas surprenant: la poésie étant, contrairement aux écritures romanesque et dramatique, souvent non-narrative, les poètes ont naturellement moins de relation avec le cinéma (du moins le cinéma traditionnel, où leurs compétences s'exportent plus difficilement). Par ailleurs, peut-être les groupes ne sont-ils pas distribués de façon homogène dans le temps: il est possible que si les poètes-ses ont moins travaillé pour la télévision, c'est car la plupart des poètes-ses de mon jeu de données sont né-es et mort-es avant l'essor de la télévision.
+# Un rapide regard des données donne déjà des informations intéressantes. Par exemple, l'activité de traduction, qui est une activité importante des poète-sses modernistes et contemporain-es, apparaît nettement comme une spécificité de ce groupe. Ce n'est pas une surprise, pour plusieurs raisons: (1) la traduction de poésie s'accomplit plus rapidement et peut donc cohabiter plus facilement avec une activité d'écriture; (2) la traduction de la poésie pose des problèmes complexes qui la font souvent percevoir comme une forme de création à part entière et au premier degré, et de fait il y a des traductions célèbres de poésie (ex. Poe traduit par Baudelaire); (3) éventuellement, la recherche d'innovation linguistique, peut-être plus présente en poésie que dans l'écriture romanesque, pousserait davantage les poéte-sses à lire ce qui se fait ailleurs -- la recherche d'un écart avec le langage ordinaire (qui caractérise la poésie) peut également être une source de motivation à lire et faire circuler des textes en langue étrangère. Il s'agit également du seul groupe chez lequel le groupe d'occupation "press" est plus élevé que le groupe "non-written media". Ici encore, ce n'est pas surprenant: la poésie étant, contrairement aux écritures romanesque et dramatique, souvent non-narrative, les poète-sses ont naturellement moins de relation avec le cinéma (du moins le cinéma traditionnel, où leurs compétences s'exportent plus difficilement). Par ailleurs, peut-être les groupes ne sont-ils pas distribués de façon homogène dans le temps: il est possible que si les poète-sses ont moins travaillé pour la télévision, c'est car la plupart des poète-sses de mon jeu de données sont né-es et mort-es avant l'essor de la télévision.
 
 # Ajouter une colonne "total" à droite afin de pouvoir plutôt travailler avec des nombres relatifs aux totaux.
 occount["total"] = occount.sum(axis=1)
@@ -162,13 +159,24 @@ print("proportion de traduction:\n")
 for i in writing_group:
     print(i, ":", round(occount[i].translation / occount[i].total, 2))
 
-# La proportion d'occupation-traduction chez les poète-sses est largement supérieure à celles qu'on trouve chez les romancier-ères et dramaturges, lesquelles sont presque identiques (0.05, 0.06). Le rapport entre la proportion chez les poète-sses et chez les dramaturges, de 1/2, est identique au rapport entre dramaturge et writers, donc il pourrait sembler peu significatif. Mais cela n'est à mon avis pas le cas. Car la proportion plus basse chez les "Writers" s'explique autrement: en effet, ce groupe est constitué d'un nombre important d'auteurices identifié comme "writer" pour des activités non-littéraires, et qui n'ont pas la situation économique précaire des auteurices littéraires, puisque les Writers sont aussi des neurologistes reconnu-es publiant des essais de vulgarisation, etc. Il va de soit que l'activité de traduction dans ces catégorie socioprofessionnelle est une activité très secondaire; puisque l'écriture ne constitue pas nécessairement leur compétence principale, les individus de ce groupe n'ont aucune raison de la mobiliser pour en faire une activité rémunératrice.
+# La proportion d'occupation-traduction chez les poète-sses est largement supérieure à celles qu'on trouve chez les romancier-ères et dramaturges, lesquelles sont presque identiques (0.05, 0.06). Le rapport entre la proportion chez les poète-sses et chez les dramaturges, de 1/2, est identique au rapport entre dramaturge et writers, donc il pourrait sembler peu significatif. Mais cela n'est à mon avis pas le cas. Car la proportion plus basse chez les "Writers" s'explique autrement: en effet, ce groupe est constitué d'un nombre important d'auteurices identifié comme "writer" pour des activités non-littéraires (ex. écrivain-es de livres scientifiques, de philosophie, etc.), et qui n'ont pas la situation économique précaire des auteurices littéraires, puisque les Writers sont aussi des neurologistes reconnu-es publiant des essais de vulgarisation, etc. Il va de soit que l'activité de traduction dans ces catégorie socioprofessionnelle est une activité très secondaire; puisque l'écriture ne constitue pas nécessairement leur compétence principale, les individus de ce groupe n'ont aucune raison de la mobiliser pour en faire une activité rémunératrice.
 
 # Calculer l'effectif attendu des poète-sses traducteurices.
 occount.total.translation * (occount.Poet.total / occount.total.total)
 
 # Le rapport entre effectif attendu et effectif observé.
-round(occount.Poet.translation / (
-    occount.total.translation
-    * (occount.Poet.total / occount.total.total)
-), 2)
+round(
+    occount.Poet.translation
+    / (
+        occount.total.translation
+        * (occount.Poet.total / occount.total.total)
+    ),
+    2,
+)
+
+# Vérifier, enfin, que le nombre élevé de poète-sses traducteurices n'est pas lié à un biais dans ma méthode de groupement des occupations. Puisque les deux seuls résultats sont "Translation" et "Translator", il n'y a pas de biais à ce niveau-là.
+set([
+    i
+    for i in list(dataframe["Poet"].occupation)
+    if re.search("[Tt]ransl", i) and 'PersonFunction' not in i
+])
