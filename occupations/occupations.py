@@ -6,8 +6,6 @@ import sparql_dataframe
 import pandas
 import re
 
-# import plotly.express as plt
-
 # Adresser la requête à DBPedia.
 dbpedia = "http://dbpedia.org/sparql"
 
@@ -28,7 +26,7 @@ for i in writing_classes:
     )
     dataframe[i] = sparql_dataframe.get(dbpedia, queries[i])
     dataframe[i]["Group"] = i
-    print(i, ':', len(dataframe[i]))
+    print(i, ":", len(dataframe[i]))
 
 # Assembler (concaténer) les dataframes en un seul dataframe.
 df = pandas.concat(dataframe.values())
@@ -59,7 +57,7 @@ len(set(df.occupation))
 # Et certaines occupations identiques apparaissent sous des noms différents.
 [i for i in set(df.occupation) if i.startswith("Drama")]
 
-# Il faut donc procéder à des regroupements. Un tri manuel serait beaucoup trop laborieux, et poserait problème pour répéter l'opération si des nouveaux résultats venaient s'ajouter. Je vais donc opter plutôt pour une approche plus approximative mais permettant d'automatiser cette opération et de l'appliquer à des données en nombre important. L'idée est d'utiliser, comme dans l'exemple ci-dessus, la correspondance de motifs (patterns) pour sélectionner et grouper des occupations. On peut par exemple grouper un certains nombres d'occupations qui se terminent en "gist", et qui, généralement, désignent des activités intellectuelles spécialisées et institutionalisées dans un cadre académique. Cette manière de faire est approximative et les résultats obtenus contiennent des erreurs (ex. Suffragist, Collagist), mais ça permet de travailler rapidement et avec une certaine souplesse dans l'éventualité où les données changeraient.
+# Il faut donc procéder à des regroupements. Un tri manuel serait beaucoup trop laborieux, et poserait problème pour répéter l'opération si des nouveaux résultats venaient s'ajouter. Je vais donc opter plutôt pour une approche plus approximative mais permettant d'automatiser cette opération et de l'appliquer à des données en nombre important. L'idée est d'utiliser, comme dans l'exemple ci-dessus, la correspondance de motifs pour sélectionner et grouper des occupations. On peut par exemple grouper un certains nombres d'occupations qui se terminent en "gist", et qui, généralement, désignent des activités intellectuelles spécialisées et institutionalisées dans un cadre académique. Cette manière de faire est approximative et les résultats obtenus contiennent des erreurs (ex. Suffragist, Collagist), mais ça permet de travailler rapidement et avec une certaine souplesse dans l'éventualité où les données changeraient.
 [i for i in set(df.occupation) if re.search("gist$", i)]
 
 # Pour la suite de l'exploration de ces données, l'objectif est d'observer les différences dans les activités annexes à l'activité de création littéraire entre les sous-groupes que constituent les "poets", les "dramatists" et les "novelists" qui constituent les trois genres dominants de la production littéraire occidentale moderne. Je n'intègre pas l'essai ni l'autobiographie, qui représentent des cas à part et sont difficiles à distinguer de pratiques non-littéraires en raison de leur caractère non-fictionnel (ex. les autobiographie de star, ou les essais de développement personnel). L'idée est de voir si certaines activités annexes sont sur- ou sous-représentrées dans certains de ces sous-groupes. Par exemple, trouve-t-on davantages de personnes exerçant des activités religieuses ou mystiques chez les poètes-ses que chez les dramaturges? À l'inverse, les dramaturges ont-iels en revanche plus tendance que les poète-sses à écrire pour le cinéma, et les romancier-ères pour la presse écrite? Les poètes font-iels plus de musique, les romancier-ères plus de peinture?
@@ -160,8 +158,17 @@ occount["total"] = occount.sum(axis=1)
 occount.loc["total"] = occount.sum(numeric_only=True, axis=0)
 occount
 
-print('proportion de traduction:\n')
+print("proportion de traduction:\n")
 for i in writing_classes:
-    print(i, ':', round(occount[i].translation / occount[i].total, 2))
+    print(i, ":", round(occount[i].translation / occount[i].total, 2))
 
 # La proportion d'occupation-traduction chez les poète-sses est largement supérieure à celles qu'on trouve chez les romancier-ères et dramaturges, lesquelles sont presque identiques (0.05, 0.06). Le rapport entre la proportion chez les poète-sses et chez les dramaturges, de 1/2, est identique au rapport entre dramaturge et writers, donc il pourrait sembler peu significatif. Mais cela n'est à mon avis pas le cas. Car la proportion plus basse chez les "Writers" s'explique autrement: en effet, ce groupe est constitué d'un nombre important d'auteurices identifié comme "writer" pour des activités non-littéraires, et qui n'ont pas la situation économique précaire des auteurices littéraires, puisque les Writers sont aussi des neurologistes reconnu-es publiant des essais de vulgarisation, etc. Il va de soit que l'activité de traduction dans ces catégorie socioprofessionnelle est une activité très secondaire; puisque l'écriture ne constitue pas nécessairement leur compétence principale, les individus de ce groupe n'ont aucune raison de la mobiliser pour en faire une activité rémunératrice.
+
+# Calculer l'effectif attendu des poète-sses traducteurices.
+occount.total.translation * (occount.Poet.total / occount.total.total)
+
+# Le rapport entre effectif attendu et effectif observé est vraiment significatif.
+round(occount.Poet.translation / (
+    occount.total.translation
+    * (occount.Poet.total / occount.total.total)
+), 2)
