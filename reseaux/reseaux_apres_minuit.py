@@ -1,5 +1,5 @@
 """
-Observation des réseaux de relations entre les différentes occupations des écrivain-es.
+Observation des réseaux de relations entre les différentes occupations des écrivain-es. Continuation nocturne du carnet "reseaux_occupations".
 """
 
 from SPARQLWrapper import SPARQLWrapper, JSON
@@ -179,7 +179,7 @@ for relation in relations:
     node1, node2, weight = relation
     G.add_edge(node1, node2, weight=weight)
 
-G.
+# G.
 
 # Tracer le graphe
 pos = nx.spring_layout(G)  # Positions des nœuds
