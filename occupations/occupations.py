@@ -12,8 +12,8 @@ dbpedia = "http://dbpedia.org/sparql"
 # Les requêtes SPARQL. Je sépare en plusieurs requêtes afin de pouvoir avoir plus que 10'000 résultats. Les requêtes portent sur les occupations des personnes ayant une des occupations suivantes: Novelist, Poet, Dramatist, Writers.
 queries = {}
 dataframe = {}
-writing_classes = ["Writer", "Novelist", "Poet", "Dramatist"]
-for i in writing_classes:
+writing_group = ["Writer", "Novelist", "Poet", "Dramatist"]
+for i in writing_group:
     queries[i] = (
         "PREFIX dbo: <http://dbpedia.org/ontology/>\n"
         "PREFIX dbr: <http://dbpedia.org/resource/>\n"
@@ -130,13 +130,13 @@ occupations_grouped = {
     "translation": ["transl"],
 }
 
-# Je mets en caractères minuscules les occupations, afin de pouvoir effectuer plus facilement les comparaison avec les mots déterminés ci-dessus. Je construis une nouvelle liste à double éléments: l'occupation et la "writing_class" (Novelist, Poet, Dramatist, Writer).
+# Je mets en caractères minuscules les occupations, afin de pouvoir effectuer plus facilement les comparaison avec les mots déterminés ci-dessus. Je construis une nouvelle liste à double éléments: l'occupation et le "writing_group" (Novelist, Poet, Dramatist, Writer).
 occupation_and_group = [(i[1].lower(), i[2]) for i in df.values]
 occupation_and_group[:10]
 
-# À travers un enchâssement de boucles, je compte, pour chaque "writing_class", combien de lignes correspondent à chacun de ces groupes d'occupations (politic, education, etc.).
+# À travers un enchâssement de boucles, je compte, pour chaque "writing_group", combien de lignes correspondent à chacun de ces groupes d'occupations (politic, education, etc.).
 count = {}
-for i in writing_classes:
+for i in writing_group:
     count[i] = {}
     for word_group in occupations_grouped:
         count[i][word_group] = 0
@@ -159,7 +159,7 @@ occount.loc["total"] = occount.sum(numeric_only=True, axis=0)
 occount
 
 print("proportion de traduction:\n")
-for i in writing_classes:
+for i in writing_group:
     print(i, ":", round(occount[i].translation / occount[i].total, 2))
 
 # La proportion d'occupation-traduction chez les poète-sses est largement supérieure à celles qu'on trouve chez les romancier-ères et dramaturges, lesquelles sont presque identiques (0.05, 0.06). Le rapport entre la proportion chez les poète-sses et chez les dramaturges, de 1/2, est identique au rapport entre dramaturge et writers, donc il pourrait sembler peu significatif. Mais cela n'est à mon avis pas le cas. Car la proportion plus basse chez les "Writers" s'explique autrement: en effet, ce groupe est constitué d'un nombre important d'auteurices identifié comme "writer" pour des activités non-littéraires, et qui n'ont pas la situation économique précaire des auteurices littéraires, puisque les Writers sont aussi des neurologistes reconnu-es publiant des essais de vulgarisation, etc. Il va de soit que l'activité de traduction dans ces catégorie socioprofessionnelle est une activité très secondaire; puisque l'écriture ne constitue pas nécessairement leur compétence principale, les individus de ce groupe n'ont aucune raison de la mobiliser pour en faire une activité rémunératrice.
@@ -167,7 +167,7 @@ for i in writing_classes:
 # Calculer l'effectif attendu des poète-sses traducteurices.
 occount.total.translation * (occount.Poet.total / occount.total.total)
 
-# Le rapport entre effectif attendu et effectif observé est vraiment significatif.
+# Le rapport entre effectif attendu et effectif observé.
 round(occount.Poet.translation / (
     occount.total.translation
     * (occount.Poet.total / occount.total.total)
