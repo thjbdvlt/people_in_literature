@@ -1,18 +1,18 @@
 """
-Observation des relations entre les différentes occupations des writers.
+Observation des relations entre les différentes occupations des écrivain-es.
 """
 
 import sparql_dataframe
 import pandas
 import re
 
-# Adresser la requête à DBPedia.
+# L'adresse de DBPedia, où la requête doit être adressée.
 dbpedia = "http://dbpedia.org/sparql"
 
 # Les requêtes SPARQL. Je sépare en plusieurs requêtes afin de pouvoir avoir plus que 10'000 résultats. Les requêtes portent sur les occupations des personnes ayant une des occupations suivantes: Novelist, Poet, Dramatist, Writers.
 queries = {}
 dataframe = {}
-writing_group = ["Writer", "Novelist", "Poet", "Dramatist"]
+writing_group = ["Writer", "Novelist", "Poet", "Playwright"]
 for i in writing_group:
     queries[i] = (
         "PREFIX dbo: <http://dbpedia.org/ontology/>\n"
@@ -159,7 +159,7 @@ print("proportion de traduction:\n")
 for i in writing_group:
     print(i, ":", round(occount[i].translation / occount[i].total, 2))
 
-# La proportion d'occupation-traduction chez les poète-sses est largement supérieure à celles qu'on trouve chez les romancier-ères et dramaturges, lesquelles sont presque identiques (0.05, 0.06). Le rapport entre la proportion chez les poète-sses et chez les dramaturges, de 1/2, est identique au rapport entre dramaturge et writers, donc il pourrait sembler peu significatif. Mais cela n'est à mon avis pas le cas. Car la proportion plus basse chez les "Writers" s'explique autrement: en effet, ce groupe est constitué d'un nombre important d'auteurices identifié comme "writer" pour des activités non-littéraires (ex. écrivain-es de livres scientifiques, de philosophie, etc.), et qui n'ont pas la situation économique précaire des auteurices littéraires, puisque les Writers sont aussi des neurologistes reconnu-es publiant des essais de vulgarisation, etc. Il va de soit que l'activité de traduction dans ces catégorie socioprofessionnelle est une activité très secondaire; puisque l'écriture ne constitue pas nécessairement leur compétence principale, les individus de ce groupe n'ont aucune raison de la mobiliser pour en faire une activité rémunératrice.
+# La proportion d'occupation-traduction chez les poète-sses est largement supérieure à celles qu'on trouve chez les romancier-ères et dramaturges, lesquelles sont identiques (0.05). Le rapport entre la proportion chez les poète-sses et chez les dramaturges, de 1/2, est identique au rapport entre dramaturge et writers, donc il pourrait sembler peu significatif. Mais cela n'est à mon avis pas le cas. Car la proportion plus basse chez les "Writers" s'explique autrement: en effet, ce groupe est constitué d'un nombre important d'auteurices identifié comme "writer" pour des activités non-littéraires (ex. écrivain-es de livres scientifiques, de philosophie, etc.), et qui n'ont pas la situation économique précaire des auteurices littéraires, puisque les Writers sont aussi des neurologistes reconnu-es publiant des essais de vulgarisation, etc. Il va de soit que l'activité de traduction dans ces catégorie socioprofessionnelle est une activité très secondaire; puisque l'écriture ne constitue pas nécessairement leur compétence principale, les individus de ce groupe n'ont aucune raison de la mobiliser pour en faire une activité rémunératrice.
 
 # Calculer l'effectif attendu des poète-sses traducteurices.
 occount.total.translation * (occount.Poet.total / occount.total.total)
