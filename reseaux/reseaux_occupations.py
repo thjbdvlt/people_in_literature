@@ -4,6 +4,8 @@ Observation des réseaux de relations entre les différentes occupations des éc
 
 from SPARQLWrapper import SPARQLWrapper, JSON
 from collections import Counter
+import networkx as nx
+import matplotlib.pyplot as plt
 
 # L'adresse de DBPedia, où la requête doit être adressée.
 sparql = SPARQLWrapper("http://dbpedia.org/sparql")
@@ -167,4 +169,29 @@ for name, occupations in d.items():
 [i for i in occ_pairs if 'Biographer' in i][:10]
 
 # Plutôt que d'avoir ainsi des doublons, on peut représenter le nombre d'occurences comme la force de la relation.
+c = Counter(occ_pairs)
+rel = [(i[0], i[1], j) for i, j in list(c.items())]
+rel[:10]
 
+G = nx.Graph()
+
+for relation in rel[:10]:
+    node1, node2, weight = relation
+    G.add_edge(node1, node2, weight=weight)
+
+# Tracer le graphe
+pos = nx.spring_layout(G)  # Positions des nœuds
+
+# Récupérer les poids des arêtes
+edge_weights = [relation[2] for relation in rel[:10]]
+
+# Tracer les arêtes avec une épaisseur basée sur les poids
+nx.draw_networkx_edges(G, pos, width=edge_weights, edge_color='gray')
+
+# Tracer les nœuds et les étiquettes
+nx.draw_networkx_nodes(G, pos, node_color='lightblue', node_size=800)
+nx.draw_networkx_labels(G, pos, font_size=12)
+
+# Afficher le graphe
+plt.axis('off')
+plt.show()
