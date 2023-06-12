@@ -203,12 +203,14 @@ def faire_un_graphe_simple_most_common(relations, nb: str):
         node1, node2 = relation[0], relation[1]
         g.add_edge(node1, node2)
     # Tracer le graphe.
+    plt.figure(figsize=(30, 30))
     pos = nx.spring_layout(g)
     nx.draw_networkx_nodes(g, pos, alpha=0.6, node_size=10)
     nx.draw_networkx_edges(g, pos, alpha=0.5, edge_color='gray')
     nx.draw_networkx_labels(g, pos, alpha=0.7, font_size=9)
 
-    plt.figure(figsize=(30, 30))
+    fp = f'img/most_common_{nb}.svg'# io.BytesIO()
+    plt.savefig(fp, format="svg")
     plt.show()
 
 
