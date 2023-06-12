@@ -162,8 +162,8 @@ for i in data_to_pop:
 
 # Enlever également des entrées restantes l'item 'writer'.
 for i, j in d.items():
-    if 'writer' in j:
-        d[i].pop(d[i].index('writer'))
+    if "writer" in j:
+        d[i].pop(d[i].index("writer"))
 
 # Le nombre d'entrées restantes dans le dictionnaires.
 len(d)
@@ -187,13 +187,6 @@ for name, occupations in d.items():
 count = Counter(occ_pairs)
 count.most_common()[:10]
 
-# relations_most_common = [
-#     (i[0], i[1], j)
-#     for i, j in list(count.most_common()[:10])
-# ]
-# relations_most_common[:10]
-
-
 def faire_un_graphe_simple_most_common(relations, nb: str):
     """
     Construit un graphe (avec visualisation) des relations les plus répandues.
@@ -202,8 +195,7 @@ def faire_un_graphe_simple_most_common(relations, nb: str):
     # Compter les relations.
     count = Counter(relations)
     relations_selected = [
-        (i[0], i[1], j)
-        for i, j in list(count.most_common()[:nb])
+        (i[0], i[1], j) for i, j in list(count.most_common()[:nb])
     ]
     # Construire le graphe
     g = nx.Graph()
@@ -212,9 +204,9 @@ def faire_un_graphe_simple_most_common(relations, nb: str):
         g.add_edge(node1, node2)
     # Tracer le graphe.
     pos = nx.spring_layout(g)
-    nx.draw_networkx_nodes(g, pos, alpha=0.6)
-    nx.draw_networkx_edges(g, pos, alpha=0.6)
-    nx.draw_networkx_labels(g, pos, alpha=0.7, font_size=9)
+    nx.draw_networkx_nodes(g, pos, alpha=0.5)
+    nx.draw_networkx_edges(g, pos, alpha=1)
+    nx.draw_networkx_labels(g, pos, alpha=1, font_size=9)
     plt.show()
 
 
@@ -226,12 +218,11 @@ faire_un_graphe_simple_most_common(occ_pairs, 10)
 
 # La sociologie des Mondes de l'art de Howard Becker semble d'ailleurs particulièrement approprié ici, davantage, par exemple, que la théorie des champs de Bourdieu (qui conçoit le fonctionnement du champ littéraire comme un ensemble de positions). Becker, en effet, décrit les mondes de l'art comme des "réseaux de coopérations", et le succès de la réalisation d'une oeuvre d'art est en fait moins la conséquence des 'talents' de l'artiste que de la capacité de l'artiste à coopérer avec les autres membres du réseaux. Les artistes doivent apprendre à manier les jeux de langages et les critères des autres corps professionnels avec lesquels iels sont amené-es à collaborer. Il leur est donc naturellement plus facile de jouer elleux-mêmes ces rôles (occupations).
 
-# Je produis une autre visualisation avec un nombre plus grand de données sélectionnées pour construire le graphe, pour observer ce qu'il se passe si l'on modifie progressivement le grain avec leque on observe ces données. Les deux clusters sont toujours séparés. De nouveaux points apparaissent des deux côtés, mais cela est particulièrement intéressant dans le cluster littéraire. Le rôle de traduction est associé aux poètes (je commenté cela dans un autre carnet), et les romancier-ères sont associés à deux nouveaux noeuds: (1) l'écriture de short-stories (de nouvelles), qui apparait ainsi comme une forme apparentée au roman, écrite avec les mêmes logiques; (2) l'écriture essayiste, ce qui n'est pas étonnant étant données que certains des romans modernes les plus importants du 20e siècle sont souvent perçues sous le prisme de l'essayisme (Proust, Musil, par exemple, en France, les exemples de Sartre ou Camus montre également le lien plus fort entre roman et essai). Tout cela montre le statut particulier du roman dans l'histoire littéraire moderne: forme hybride à la fois narrative et réflexive, forme totale qui a la capacité d'absorber tous les autres genres littéraires (ici: novelist est le seul point qui est connecté à tous les autres points littéraires: poet, playwright, essayist, short-story). 
+# Je produis une autre visualisation avec un nombre plus grand de données sélectionnées pour construire le graphe, pour observer ce qu'il se passe si l'on modifie progressivement le grain avec lequel on observe ces données. Les deux clusters sont toujours séparés. De nouveaux points apparaissent des deux côtés, et se montre particulièrement intéressant dans le cluster littéraire. Le rôle de traduction est associé aux poètes (je commenté cela dans un autre carnet), et les romancier-ères sont associé-es à deux nouveaux noeuds: (1) l'écriture de short-stories (de nouvelles), qui apparait ainsi comme une forme apparentée au roman, écrite avec les mêmes logiques; (2) l'écriture essayiste, ce qui n'est pas étonnant étant donné que certains des romans modernes les plus importants du 20e siècle sont souvent perçues sous le prisme de l'essayisme (par exemple Proust ou Musil). Tout cela montre le statut particulier du roman dans l'histoire littéraire moderne: forme hybride à la fois narrative et réflexive, forme souple et "totale" qui a la capacité d'absorber tous les autres genres littéraires (ici: novelist est le seul point qui est connecté à tous les autres points littéraires: poet, playwright, essayist, short-story).
 faire_un_graphe_simple_most_common(occ_pairs, 20)
 
-# En augmentant encore un peu le nombre de relations à intégrer dans le graphe jusqu'à relier les deux clusters, on peut voir que les occupations qui relient les deux clusters sont screenwriter et playwright, l'écriture pour le théâtre et l'écriture pour le cinéma: deux activités d'écriture qui incluent des formes de coopération et d'anticipation, par exemple concernant la manière dont le texte pourra être interprêté par les comédien-nes, mis en scène, produit. Les contraintes d'écritures (format, durée, etc.) relatives au monde chargé de diffuser l'oeuvre sont ainsi bien plus proches pour le théâtre et le cinéma qu'entre théâtre et roman.
+# En augmentant encore un peu le nombre de relations à intégrer dans le graphe jusqu'à relier les deux clusters, on peut voir que les occupations qui relient les deux clusters sont screenwriter et playwright, l'écriture pour le théâtre et l'écriture pour le cinéma: deux activités d'écriture qui incluent des formes de coopération avec et d'anticipation à l'égard des autres participant-es au monde de l'art concerné, par exemple au sujet de la manière dont le texte pourra être interprêté par les comédien-nes, mis en scène, produit. Les contraintes d'écritures (format, durée, etc.) relatives au monde chargé de diffuser l'oeuvre sont ainsi bien plus proches pour le théâtre et le cinéma qu'entre théâtre et roman (ni les romancier-ères ni les poète-sses n'ont à se demander si leur oeuvre pourra être matériellement fabriquée et mise en scène: cela est hors de leur écriture, mais fait intégralement partie de l'écriture des screenwriters et des playwrights).
 faire_un_graphe_simple_most_common(occ_pairs, 23)
-
 
 # Construire un graphe avec toutes les données. Impossible à visualiser, mais à partir duquel faire des recherches et produire des sous-graphes à visualiser.
 #
