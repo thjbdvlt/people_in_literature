@@ -200,7 +200,7 @@ def tracer_montrer_graphe_sans_poids(graph):
 
     # Tracer les nœuds et les étiquettes
     nx.draw_networkx_nodes(
-        graph, pos, node_color="lightblue", node_size=800
+        graph, pos, node_color="lightblue", node_size=10
     )
     nx.draw_networkx_labels(graph, pos, font_size=12)
 
