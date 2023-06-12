@@ -164,8 +164,6 @@ for i in data_to_pop:
 for i, j in d.items():
     if "writer" in j:
         d[i].pop(d[i].index("writer"))
-
-# Il me faut maintenant refaire la liste des
 uniqpairs = [(i, j) for i, j in uniqpairs if j != "writer"]
 
 # Le nombre d'entrées restantes dans le dictionnaires.
@@ -211,10 +209,9 @@ def faire_un_graphe_simple_most_common(relations, nb: str):
     pos = nx.spring_layout(g)
     nx.draw_networkx_nodes(g, pos, alpha=0.6, node_color="gainsboro")
     nx.draw_networkx_edges(g, pos, alpha=0.5, edge_color="gray")
-    # nx.draw_networkx_labels(g, pos, alpha=0.7, font_size=11)
     nx.draw_networkx_labels(g, pos, alpha=0.7, font_size="medium")
 
-    fp = f"img/most_common_{nb}.svg"  # io.BytesIO()
+    fp = f"img/most_common_{nb}.svg"
     plt.savefig(fp, format="svg")
     plt.show()
 
@@ -280,42 +277,16 @@ def relier(
     return connecting_nodes
 
 
-def relier(
-    start_node: str, end_node: str, max_steps: int, mini_weight: int
-):
-    """
-    Trouver les nodes qui relient le plus directement deux nodes.
-
-    Comme paramètres: les deux nodes (start_node/end_node), le maximum de steps (de nodes intermédiares), et le poids minimum des edges qui permettent de relier ces deux nodes.
-    """
-    connecting_nodes = []
-    for path in nx.all_simple_paths(
-        g, source=start_node, target=end_node, cutoff=max_steps
-    ):
-        if all(
-            g.get_edge_data(path[i], path[i + 1]).get("weight", 0)
-            >= mini_weight
-            for i in range(len(path) - 1)
-        ):
-            connecting_nodes.extend(path)
-    connecting_nodes = [
-        i
-        for i in list(set(connecting_nodes))
-        if i not in [start_node, end_node]
-    ]
-    return connecting_nodes
-
-
 # Les trajets les plus courts entre les deux activités les plus éloignés de notre dernière visualisation.
 relier("translator", "comedian", 2, 1)
 
-# Le résultat ci-dessus est difficile à interpréter. J'augmente le poids minimum des edges pour trouver, en le diminuant progressivement, le node qui relie ces deux nodes, avec un trajets plus grand (4) et le poids le plus important possible. On a déjà vu que l'occupation journalist était en relation significative avec les occupations littéraires, et je pense qu'on peut imaginer sans trop de difficultés qu'elle est aussi en relation avec le monde du cinéma. Le journalisme pourrait ainsi être un métier d'appui, y compris pour des individus exerçant des professions non-liées à l'écrit.
+# Le résultat ci-dessus est difficile à interpréter. J'augmente le poids minimum des edges pour trouver, en le diminuant progressivement, le node qui relie ces deux nodes, avec un trajets plus grand (4) et le poids le plus important possible.
 n = 100
 while len(relier("translator", "comedian", 2, n)) < 1:
     n = n - 1
 print("poids:", n, "->", relier("translator", "comedian", 2, n))
 
-# Trouver les noms des personnes ayant les occupations translator et comedian. Il deux personnes: la première, Robert Beauvais, est un comédien et auteur français, qui a écrit des romans ainsi que leur adaptatin au cinéma. L'article Wikipedia ne nous dit rien de son activité journalistique. La seconde personne, en revanche, Rudy Badil, s'est reconvertie dans le journalisme après avoir du abandonner une carrière dans la comédie en raison de problème d'anxiété liés au fait de monter sur scène. Dans ce cas, le journalisme apparaît non seulement comme un métier d'appui possible pour des non-professionnels des médias que comme une possibilité de repli.
+# On a déjà vu que l'occupation journalist était en relation significative avec les occupations littéraires, et je pense qu'on peut imaginer sans trop de difficultés qu'elle est aussi en relation avec le monde du cinéma. Le journalisme pourrait ainsi être un métier d'appui, y compris pour des individus exerçant des professions non-liées à l'écrit. Trouver les noms des personnes ayant les occupations translator et comedian. Il deux personnes: la première, Robert Beauvais, est un comédien et auteur français, qui a écrit des romans ainsi que leur adaptatin au cinéma. L'article Wikipedia ne nous dit rien de son activité journalistique. La seconde personne, en revanche, Rudy Badil, s'est reconvertie dans le journalisme après avoir du abandonner une carrière dans la comédie en raison de problème d'anxiété liés au fait de monter sur scène. Dans ce cas, le journalisme apparaît moins comme un métier d'appui possible pour des non-professionnels des médias que comme une possibilité de repli.
 for i in g.nodes():
     if g.nodes[i]["type"] == "P":
         if g.has_edge(i, "journalist"):
@@ -335,11 +306,109 @@ degree = dict([(d[0], {"degree": d[1]}) for d in nx.degree(g)])
 for i in ("poet", "novelist"):
     print(f"{i}:", degree[i])
 
+
 # Je compare maintenant le nombre d'arêtes qui relie 'poet' et 'novelist' aux autres nodes. Si les poètes ont une plus grande connectivité à d'autres activités (que ce soit par esprit d'avant-garde ou par précarité), la proportion de nodes 'occupations' devrait être plus élevé que celle de nodes 'person' parmi les edges de 'poet' que de 'novelist'. Quoi que la différence soit légère, le résultat de la boucle suivante va dans ce sens: les poète-sses ont un plus grand nombre d'occupations annexes (une plus grande variété), non seulement proportionnellement mais également en nombre absolu (la population de poète est plus basse, mais le nombre d'occupations annexes est plus haut).
-for o in ['poet', 'novelist']:
-    t = degree[o]['degree']
-    a = len([i for i in g[o] if g.nodes[i]['type'] == 'O'])
-    print(f'{o}:', a, '/', t, f'({round(a / t, 2)})')
+def proportion(valeur: int, total: int, arrondi: int = 2):
+    """
+    Fonction pour print une valeur, un total, et le rapport entre les deux.
+    """
+    print(f"{valeur}/{total} ({round(valeur / total, 2)})")
 
 
+for o in ["poet", "novelist"]:
+    t = degree[o]["degree"]
+    a = len([i for i in g[o] if g.nodes[i]["type"] == "O"])
+    print(o)
+    proportion(a, t)
 
+# Je place les mêmes données, pour chaque occupations, dans un dictionnaire.
+c = {}
+for o in [i for i in g.nodes() if g.nodes[i]["type"] == "O"]:
+    c[o] = {}
+    c[o]["T"] = degree[o]["degree"]
+    c[o]["O"] = len([i for i in g[o] if g.nodes[i]["type"] == "O"])
+    c[o]["P"] = c[o]["T"] - c[o]["O"]
+
+# Je crée, pour chaque node, une nouvelle entrée dans le dictionnaire, à laquelle j'attribue, comme valeur, la somme des edges connectant les nodes occupations (auxquels le node est lié) à d'autres nodes.
+for o in c.keys():
+    c[o]["X"] = 0
+    for node in g[o]:
+        if g.nodes[node]["type"] == "O":
+            if g.has_edge(o, node):
+                c[o]["X"] += c[node]["O"]
+
+# Les occupations avec le plus de connections directe (lenght=1) avec d'autres occupations.
+a = [(c[i]["X"], i) for i in c.keys() if c[i]["X"] != 0]
+a.sort()
+a.reverse()
+a[:10]
+
+# Les occupations avec le plus de connections indirecte (lenght=2) avec d'autres occupations.
+b = [(c[i]["O"], i) for i in c.keys() if c[i]["O"] != 0]
+b.sort()
+b.reverse()
+b[:10]
+
+
+def deuxcolonnes(a: list, b: list, n: int):
+    """
+    Présente le haut de deux liste côte à côte.
+    """
+    # for L in (a, b):
+    #     all.extend([j for i, j in L[:10]])
+    all = [j for i, j in a[:10]] + [j for i, j in b[:10]]
+    all = []
+    for L in (a, b):
+        all.extend([j for i, j in L[:10]])
+    max = 0
+    for e in all:
+        if len(e) > max:
+            max = len(e)
+    max
+    for i in range(0, 10):
+        print(a[i][1], (max - len(a[i][1])) * " ", b[i][1])
+
+
+# Si l'on compare les occupations les plus connectés directement et les plus connectées indirectement, on peut voir que la position de novelist et de poet s'inverse. L'occupation poète est donce connectée à des occupations elles-mêmes assez connectées. Ce résultat vient très probablement de la forte connexion entre poet et journalist.
+deuxcolonnes(a, b, 10)
+
+# Prendre en compte l'ampleur de chaque connection: si A est connecté à B par 10 personnes, et que B est connecté à 20 occupations, alors j'attribue à A une valeur de 200 (10 * 20) provenant de B. Le résultat obtenu est une connectivité absolu (non relative au nombre de personnes qui ont A comme occupation). L'occupation poète a à nouveau une place un peu plus importante. L'occupation screenwriter, qu'on a déjà vu être au croisement des deux clusters littérature / cinéma-tv, se trouve également avoir un score assez haut de connectivité. Mais c'est film_director qui apparait comme le plus connecté indirectement.
+for o in c.keys():
+    c[o]["XP"] = 0
+    total_personnes = c[o]["P"]
+    for node in g[o]:
+        if g.nodes[node]["type"] == "O":
+            if g.has_edge(o, node):
+                c[o]["XP"] += c[node]["O"] * g[o][node]["weight"]
+xp = [(c[i]["XP"], i) for i in c.keys() if c[i]["XP"] != 0]
+xp.sort()
+xp.reverse()
+xp[:10]
+
+
+for o in c.keys():
+    c[o]["XP"] = 0
+    total_personnes = c[o]["P"]
+    for node in g[o]:
+        if g.nodes[node]["type"] == "O":
+            if g.has_edge(o, node):
+                c[o]["XP"] += c[node]["O"] * g[o][node]["weight"]
+
+# Construction d'un sous-graphe à partir de ces nouvelles données, qui permet de visualiser les choses mises en évidence au début de l'analyse.
+node_w = {o: c[o]['XP'] for o in c.keys()}
+nx.set_node_attributes(g, node_w, "weight")
+xp = [(c[i]["XP"], o) for o in c.keys() if c[o]["XP"] != 0]
+nodes = [node[1] for node in xp if c[node[1]]['O'] > 10]
+subgraph = g.subgraph(nodes)
+plt.figure(figsize=(30, 30))
+pos = nx.spring_layout(subgraph)
+node_sizes = [
+    (subgraph.nodes[node]["weight"] / 10) for node in subgraph.nodes()
+]
+nx.draw_networkx_nodes(
+    subgraph, pos, node_color="burlywood", node_size=node_sizes
+)
+nx.draw_networkx_edges(subgraph, pos, alpha=0.5, edge_color="gainsboro")
+nx.draw_networkx_labels(subgraph, pos, alpha=0.7, font_size="medium")
+plt.axis("off")
+plt.show()
