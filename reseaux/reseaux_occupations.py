@@ -204,9 +204,9 @@ def faire_un_graphe_simple_most_common(relations, nb: str):
         g.add_edge(node1, node2)
     # Tracer le graphe.
     pos = nx.spring_layout(g)
-    nx.draw_networkx_nodes(g, pos, alpha=0.5)
-    nx.draw_networkx_edges(g, pos, alpha=1)
-    nx.draw_networkx_labels(g, pos, alpha=1, font_size=9)
+    nx.draw_networkx_nodes(g, pos, alpha=0.6, node_size=1)
+    nx.draw_networkx_edges(g, pos, alpha=0.5)
+    nx.draw_networkx_labels(g, pos, alpha=0.7, font_size=9)
     plt.show()
 
 
