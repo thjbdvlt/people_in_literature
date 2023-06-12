@@ -317,7 +317,7 @@ print("poids:", n, "->", relier("translator", "comedian", 2, n))
 
 # Trouver les noms des personnes ayant les occupations translator et comedian. Il deux personnes: la première, Robert Beauvais, est un comédien et auteur français, qui a écrit des romans ainsi que leur adaptatin au cinéma. L'article Wikipedia ne nous dit rien de son activité journalistique. La seconde personne, en revanche, Rudy Badil, s'est reconvertie dans le journalisme après avoir du abandonner une carrière dans la comédie en raison de problème d'anxiété liés au fait de monter sur scène. Dans ce cas, le journalisme apparaît non seulement comme un métier d'appui possible pour des non-professionnels des médias que comme une possibilité de repli.
 for i in g.nodes():
-    if g.nodes[i]["ype"] == "P":
+    if g.nodes[i]["type"] == "P":
         if g.has_edge(i, "journalist"):
             if g.has_edge(i, "comedian"):
                 print(i)
