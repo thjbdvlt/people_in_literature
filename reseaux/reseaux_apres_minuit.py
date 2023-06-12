@@ -192,21 +192,18 @@ for relation in relations_most_common:
 
 
 # Tracer le graphe
-def tracer_montrer_graphe_sans_poids(graph):
-
-    # Positions des nœuds
-    pos = nx.spring_layout(graph)
-    nx.draw_networkx_edges(graph, pos, edge_color="gray")
-
-    # Tracer les nœuds et les étiquettes
+def tracer_montrer_graphe_sans_poids(g):
+    pos = nx.spring_layout(g)
     nx.draw_networkx_nodes(
-        graph, pos, node_color="lightblue", node_size=10
+        g, pos, alpha=0.6
     )
-    nx.draw_networkx_labels(graph, pos, font_size=12)
-
-    # Afficher le graphe
-    plt.axis("off")
+    nx.draw_networkx_edges(
+        g, pos, alpha=0.6
+    )
+    nx.draw_networkx_labels(g, pos, alpha=0.7, font_size=9)
+    # plt.axis("off")
     plt.show()
+
 
 tracer_montrer_graphe_sans_poids(graph_most_common)
 
