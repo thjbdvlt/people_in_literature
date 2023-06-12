@@ -165,6 +165,9 @@ for i, j in d.items():
     if "writer" in j:
         d[i].pop(d[i].index("writer"))
 
+# Il me faut maintenant refaire la liste des
+uniqpairs = [(i, j) for i, j in uniqpairs if j != "writer"]
+
 # Le nombre d'entrées restantes dans le dictionnaires.
 len(d)
 
@@ -187,6 +190,7 @@ for name, occupations in d.items():
 count = Counter(occ_pairs)
 count.most_common()[:10]
 
+
 def faire_un_graphe_simple_most_common(relations, nb: str):
     """
     Construit un graphe (avec visualisation) des relations les plus répandues.
@@ -205,11 +209,12 @@ def faire_un_graphe_simple_most_common(relations, nb: str):
     # Tracer le graphe.
     plt.figure(figsize=(30, 30))
     pos = nx.spring_layout(g)
-    nx.draw_networkx_nodes(g, pos, alpha=0.6, node_size=10)
-    nx.draw_networkx_edges(g, pos, alpha=0.5, edge_color='gray')
-    nx.draw_networkx_labels(g, pos, alpha=0.7, font_size=9)
+    nx.draw_networkx_nodes(g, pos, alpha=0.6, node_color="gainsboro")
+    nx.draw_networkx_edges(g, pos, alpha=0.5, edge_color="gray")
+    # nx.draw_networkx_labels(g, pos, alpha=0.7, font_size=11)
+    nx.draw_networkx_labels(g, pos, alpha=0.7, font_size="medium")
 
-    fp = f'img/most_common_{nb}.svg'# io.BytesIO()
+    fp = f"img/most_common_{nb}.svg"  # io.BytesIO()
     plt.savefig(fp, format="svg")
     plt.show()
 
@@ -228,34 +233,113 @@ faire_un_graphe_simple_most_common(occ_pairs, 20)
 # En augmentant encore un peu le nombre de relations à intégrer dans le graphe jusqu'à relier les deux clusters, on peut voir que les occupations qui relient les deux clusters sont screenwriter et playwright, l'écriture pour le théâtre et l'écriture pour le cinéma: deux activités d'écriture qui incluent des formes de coopération avec et d'anticipation à l'égard des autres participant-es au monde de l'art concerné, par exemple au sujet de la manière dont le texte pourra être interprêté par les comédien-nes, mis en scène, produit. Les contraintes d'écritures (format, durée, etc.) relatives au monde chargé de diffuser l'oeuvre sont ainsi bien plus proches pour le théâtre et le cinéma qu'entre théâtre et roman (ni les romancier-ères ni les poète-sses n'ont à se demander si leur oeuvre pourra être matériellement fabriquée et mise en scène: cela est hors de leur écriture, mais fait intégralement partie de l'écriture des screenwriters et des playwrights).
 faire_un_graphe_simple_most_common(occ_pairs, 23)
 
-# Construire un graphe avec toutes les données. Impossible à visualiser, mais à partir duquel faire des recherches et produire des sous-graphes à visualiser.
-#
-# # Commencer par placer les nodes
-# g = nx.Graph()
-# for name, occupation in uniqpairs:
-#     node_person = (name, {"node_type": "P"})
-#     node_occupation = (occupation, {"node_type": "O"})
-#     g.add_nodes_from([node_person])
-#     g.add_nodes_from([node_occupation])
-#     g.add_edge(name, occupation)
-#
-# # Puis les edges, avec un attribut "poids" (weight): le nombre de paires de ces occupations.
-# count = Counter(occ_pairs).items()
-# for occs, nb in count:
-#     g.add_edges_from([(occs[0], occs[1], {"weight": nb})])
-#
-# start_node = "poet"
-# end_node = "actor"
-# a = nx.shortest_path_length(g, start_node, end_node)
-# a
-# #
-# reachable_nodes = [
-#     node
-#     for node in g.nodes()
-#     if nx.has_path(g, node, end_node)
-#     and nx.has_path(g, start_node, node)
-#     and nx.shortest_path_length(g, start_node, node) <= 2
-#     and nx.shortest_path_length(g, node, end_node) <= 2
-# ]
-# len(reachable_nodes)
-# len([i for i in g.nodes()])
+# Je vais maintenant construire un graphe avec toutes les données, impossible à visualiser mais que je pourrai interroger et à partir duquel réaliser des 'sous-graphe' qu'il sera possible de visualiser.
+g = nx.Graph()
+
+# Les nodes: tous les noms de personnes, toutes les occupations.
+all_names = [(name, {"type": "P"}) for name, occupation in uniqpairs]
+all_occs = [
+    (occupation, {"type": "O"}) for name, occupation in uniqpairs
+]
+g.add_nodes_from(all_names + all_occs)
+
+# Les edges sans poids: les relations person-occupation.
+g.add_edges_from(uniqpairs)
+
+# Puis les edges avec un attribut "poids" (weight): les relations occupation-occupation (le poids est égal à la fréquence de cette relation = de la coprésence de ces deux occupation chez les personnes). (Cela pourrait probablement être calculé dans le graphe, mais le faire ainsi est facile et rapide.)
+count = Counter(occ_pairs).items()
+for occs, nb in count:
+    g.add_edges_from([(occs[0], occs[1], {"weight": nb})])
+
+# Dans le graphe précédent, les deux activités les plus éloignées sont 'comedian' et 'translator'. Quels sont les points qui les relient le plus directement?
+
+
+def relier(
+    start_node: str, end_node: str, max_steps: int, mini_weight: int
+):
+    """
+    Trouver les nodes qui relient le plus directement deux nodes.
+
+    Comme paramètres: les deux nodes (start_node/end_node), le maximum de steps (de nodes intermédiares), et le poids minimum des edges qui permettent de relier ces deux nodes.
+    """
+    connecting_nodes = []
+    for path in nx.all_simple_paths(
+        g, source=start_node, target=end_node, cutoff=max_steps
+    ):
+        if all(
+            g.get_edge_data(path[i], path[i + 1]).get("weight", 0)
+            >= mini_weight
+            for i in range(len(path) - 1)
+        ):
+            connecting_nodes.extend(path)
+    connecting_nodes = [
+        i
+        for i in list(set(connecting_nodes))
+        if i not in [start_node, end_node]
+    ]
+    return connecting_nodes
+
+
+def relier(
+    start_node: str, end_node: str, max_steps: int, mini_weight: int
+):
+    """
+    Trouver les nodes qui relient le plus directement deux nodes.
+
+    Comme paramètres: les deux nodes (start_node/end_node), le maximum de steps (de nodes intermédiares), et le poids minimum des edges qui permettent de relier ces deux nodes.
+    """
+    connecting_nodes = []
+    for path in nx.all_simple_paths(
+        g, source=start_node, target=end_node, cutoff=max_steps
+    ):
+        if all(
+            g.get_edge_data(path[i], path[i + 1]).get("weight", 0)
+            >= mini_weight
+            for i in range(len(path) - 1)
+        ):
+            connecting_nodes.extend(path)
+    connecting_nodes = [
+        i
+        for i in list(set(connecting_nodes))
+        if i not in [start_node, end_node]
+    ]
+    return connecting_nodes
+
+
+# Les trajets les plus courts entre les deux activités les plus éloignés de notre dernière visualisation.
+relier("translator", "comedian", 2, 1)
+
+# Le résultat ci-dessus est difficile à interpréter. J'augmente le poids minimum des edges pour trouver, en le diminuant progressivement, le node qui relie ces deux nodes, avec un trajets plus grand (4) et le poids le plus important possible. On a déjà vu que l'occupation journalist était en relation significative avec les occupations littéraires, et je pense qu'on peut imaginer sans trop de difficultés qu'elle est aussi en relation avec le monde du cinéma. Le journalisme pourrait ainsi être un métier d'appui, y compris pour des individus exerçant des professions non-liées à l'écrit.
+n = 100
+while len(relier("translator", "comedian", 2, n)) < 1:
+    n = n - 1
+print("poids:", n, "->", relier("translator", "comedian", 2, n))
+
+# Trouver les noms des personnes ayant les occupations translator et comedian. Il deux personnes: la première, Robert Beauvais, est un comédien et auteur français, qui a écrit des romans ainsi que leur adaptatin au cinéma. L'article Wikipedia ne nous dit rien de son activité journalistique. La seconde personne, en revanche, Rudy Badil, s'est reconvertie dans le journalisme après avoir du abandonner une carrière dans la comédie en raison de problème d'anxiété liés au fait de monter sur scène. Dans ce cas, le journalisme apparaît non seulement comme un métier d'appui possible pour des non-professionnels des médias que comme une possibilité de repli.
+for i in g.nodes():
+    if g.nodes[i]["ype"] == "P":
+        if g.has_edge(i, "journalist"):
+            if g.has_edge(i, "comedian"):
+                print(i)
+
+# Idem avec un trajet plus long. Le résultat représente les occupations intermédiaires entre la 'translator' et 'comedian'.
+n = 100
+while len(relier("translator", "comedian", 3, n)) < 1:
+    n = n - 1
+print("poids:", n, "->", relier("translator", "comedian", 3, n))
+
+# Si, parmi les littérateurices, novelist semblait être l'occupation la plus connectée avec les autres activités littéraires, il se pourrait que poet soit une occupation avec une plus grande extension, qui connecte (indirectement) des pratiques ordinairement plus éloignées. (Je laisse actor de côté, très proche de comedian.)
+# Je me propose pour la fin de ce carnet d'explorer cette question de la  'connectivité' des pratiques poétiques.
+# Je commence par comparer les degrés de centralité de l'occupation poet et de l'occupation novelist
+degree = dict([(d[0], {"degree": d[1]}) for d in nx.degree(g)])
+for i in ("poet", "novelist"):
+    print(f"{i}:", degree[i])
+
+# Je compare maintenant le nombre d'arêtes qui relie 'poet' et 'novelist' aux autres nodes. Si les poètes ont une plus grande connectivité à d'autres activités (que ce soit par esprit d'avant-garde ou par précarité), la proportion de nodes 'occupations' devrait être plus élevé que celle de nodes 'person' parmi les edges de 'poet' que de 'novelist'. Quoi que la différence soit légère, le résultat de la boucle suivante va dans ce sens: les poète-sses ont un plus grand nombre d'occupations annexes (une plus grande variété), non seulement proportionnellement mais également en nombre absolu (la population de poète est plus basse, mais le nombre d'occupations annexes est plus haut).
+for o in ['poet', 'novelist']:
+    t = degree[o]['degree']
+    a = len([i for i in g[o] if g.nodes[i]['type'] == 'O'])
+    print(f'{o}:', a, '/', t, f'({round(a / t, 2)})')
+
+
+
