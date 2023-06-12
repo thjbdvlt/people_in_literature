@@ -208,7 +208,7 @@ def faire_un_graphe_simple_most_common(relations, nb: str):
     nx.draw_networkx_edges(g, pos, alpha=0.5, edge_color='gray')
     nx.draw_networkx_labels(g, pos, alpha=0.7, font_size=9)
 
-    plt.figure(figsize=(20, 10))
+    plt.figure(figsize=(30, 30))
     plt.show()
 
 
